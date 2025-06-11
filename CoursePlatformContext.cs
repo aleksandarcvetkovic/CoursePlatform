@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using CoursePlatform.Models;
 
 namespace CoursePlatform.Models;
 
@@ -10,11 +11,17 @@ public class CoursePlatformContext : DbContext
 
     }
 
-   public DbSet<Course> Courses { get; set; }
+        public DbSet<Course> Courses { get; set; }
         public DbSet<Instructor> Instructors { get; set; }
         public DbSet<Student> Students { get; set; }
         public DbSet<Enrollment> Enrollments { get; set; }
 
+public DbSet<CoursePlatform.Models.EnrollmentDTO> EnrollmentDTO { get; set; } = default!;
+
+public DbSet<InstructorDTO> InstructorDTO { get; set; } = default!;
+
+public DbSet<CoursePlatform.Models.StudentDTO> StudentDTO { get; set; } = default!;
+/*
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Enrollment>()
@@ -32,4 +39,5 @@ public class CoursePlatformContext : DbContext
                 .WithMany(i => i.Courses)
                 .HasForeignKey(c => c.InstructorId);
         }
+        */
 }
