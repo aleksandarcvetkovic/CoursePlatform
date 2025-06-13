@@ -20,38 +20,45 @@ namespace CoursePlatform.Controllers
             _context = context;
         }
 
-        // GET: api/Instructor
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<InstructorDTO>>> GetInstructorDTO()
+        public async Task<ActionResult<IEnumerable<Instructor>>> GetInstructor()
         {
-            return await _context.InstructorDTO.ToListAsync();
+            return await _context.Instructors.ToListAsync();
+            
+
         }
 
-        // GET: api/Instructor/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<InstructorDTO>> GetInstructorDTO(int id)
+        public async Task<ActionResult<Instructor>> GetInstructor(string id)
         {
-            var instructorDTO = await _context.InstructorDTO.FindAsync(id);
+            
+            var instructor = await _context.Instructors.FindAsync(id);
 
-            if (instructorDTO == null)
+            if (instructor == null)
             {
                 return NotFound();
             }
 
-            return instructorDTO;
+            return instructor;
+            
         }
 
-        // PUT: api/Instructor/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutInstructorDTO(int id, InstructorDTO instructorDTO)
+        public async Task<IActionResult> PutInstructorDTO(InstructorDTO instructorDTO)
         {
-            if (id != instructorDTO.Id)
+            
+            var instructor = await _context.Instructors.FindAsync(instructorDTO.Id);
+
+            if (instructor == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            _context.Entry(instructorDTO).State = EntityState.Modified;
+            instructor.Email = instructorDTO.Email;
+            instructor.Name = instructor.Name;
+            instructor.Id = instructor.Id;
+
+            _context.Entry(instructor).State = EntityState.Modified;
 
             try
             {
@@ -59,49 +66,50 @@ namespace CoursePlatform.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!InstructorDTOExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest();
             }
 
             return NoContent();
+            
         }
 
-        // POST: api/Instructor
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<InstructorDTO>> PostInstructorDTO(InstructorDTO instructorDTO)
+        public async Task<ActionResult<InstructorDTO>> PostInstructor(InstructorDTO instructorDTO)
         {
-            _context.InstructorDTO.Add(instructorDTO);
+
+            Instructor instructor = new();
+            instructor.Email = instructorDTO.Email;
+            instructor.Name = instructorDTO.Name;
+            instructor.Id = instructorDTO.Id;
+
+            _context.Instructors.Add(instructor);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetInstructorDTO", new { id = instructorDTO.Id }, instructorDTO);
+            return CreatedAtAction("GetInstructor", new { id = instructorDTO.Id }, instructorDTO);
+            
         }
 
-        // DELETE: api/Instructor/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteInstructorDTO(int id)
+        public async Task<IActionResult> DeleteInstructor(string id)
         {
-            var instructorDTO = await _context.InstructorDTO.FindAsync(id);
-            if (instructorDTO == null)
+            
+            var instructor = await _context.Instructors.FindAsync(id);
+            if (instructor == null)
             {
                 return NotFound();
             }
 
-            _context.InstructorDTO.Remove(instructorDTO);
+            _context.Instructors.Remove(instructor);
             await _context.SaveChangesAsync();
 
             return NoContent();
+            
         }
 
-        private bool InstructorDTOExists(int id)
+        private bool InstructorDTOExists(string id)
         {
-            return _context.InstructorDTO.Any(e => e.Id == id);
+            return _context.Instructors.Any(e => e.Id == id);
+        
         }
     }
 }

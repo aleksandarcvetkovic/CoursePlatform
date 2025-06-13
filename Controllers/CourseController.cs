@@ -29,37 +29,77 @@ public class CourseController : ControllerBase
             return StatusCode(500, new { connected = false, error = ex.Message });
         }
     }
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Course>>> GetCourses()
     {
-        return Ok("ispravno");
+        return await _context.Courses.ToListAsync();
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<Course>> GetCourse(string id)
     {
-        return Ok("working got= " + id);
+        var courseDTO = await _context.Courses.FindAsync(id);
+
+            if (courseDTO == null)
+            {
+                return NotFound();
+            }
+
+            return courseDTO;
     }
 
     [HttpPost]
-    public async Task<ActionResult<Course>> PostCourse(Course course)
+    public async Task<ActionResult<Course>> PostCourse(CourseDTO courseDTO)
     {
-        return Ok(course);
+
+            Course course = new();
+
+            course.Id = courseDTO.Id;
+            course.Title = courseDTO.Title;
+            course.Description = courseDTO.Description;
+            course.InstructorId = courseDTO.InstructorId;
+        
+            _context.Courses.Add(course);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetCourse", new { id = courseDTO.Id }, courseDTO);
+            
+           
     }
 
     [HttpPut]
-    public async Task<IActionResult> PutCourse(string id, Course course)
+    public async Task<IActionResult> PutCourse(CourseDTO courseDTO)
     {
-        if (id != course.Id)
-        {
-            return BadRequest();
-        }
+            var courseEntry = await _context.Courses.FindAsync(courseDTO.Id);
 
-        return NoContent();
+            if (courseEntry == null)
+            {
+                return NotFound();
+            }
+
+            courseEntry.Id = courseDTO.Id;
+            courseEntry.Title = courseDTO.Title;
+            courseEntry.Description = courseDTO.Description;
+            courseEntry.InstructorId = courseEntry.InstructorId;
+            
+
+            _context.Entry(courseEntry).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return BadRequest();
+            }
+
+            return NoContent();
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteCourseDTO(int id)
+    public async Task<IActionResult> DeleteCourseDTO(string id)
     {
         var courseDTO = await _context.Courses.FindAsync(id);
         if (courseDTO == null)

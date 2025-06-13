@@ -4,10 +4,10 @@ public class Enrollment
 {
     public string Id { get; set; }
 
-    public int CourseId { get; set; }
+    public string CourseId { get; set; }
     public Course Course { get; set; }
 
-    public int StudentId { get; set; }
+    public string StudentId { get; set; }
     public Student Student { get; set; }
 
     public DateTime EnrolledOn { get; set; }

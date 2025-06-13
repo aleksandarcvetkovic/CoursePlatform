@@ -21,37 +21,45 @@ namespace CoursePlatform.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<EnrollmentDTO>>> GetEnrollmentDTO()
+        public async Task<ActionResult<IEnumerable<Enrollment>>> GetEnrollmentDTO()
         {
-            return Ok();
-            //return await _context.EnrollmentDTO.ToListAsync();
+            return await _context.Enrollments.ToListAsync();
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<EnrollmentDTO>> GetEnrollmentDTO(int id)
+        public async Task<ActionResult<Enrollment>> GetEnrollment(string id)
         {
-            /*
-            var enrollmentDTO = await _context.EnrollmentDTO.FindAsync(id);
+            
+            var enrollment = await _context.Enrollments.FindAsync(id);
 
-            if (enrollmentDTO == null)
+            if (enrollment == null)
             {
                 return NotFound();
             }
 
-            return enrollmentDTO;
-            */
-            return Ok();
+            return enrollment;
+           
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEnrollmentDTO(int id, EnrollmentDTO enrollmentDTO)
+        public async Task<IActionResult> PutEnrollment(EnrollmentDTO enrollmentDTO)
         {
-            if (id != enrollmentDTO.Id)
+            var enrollment = await _context.Enrollments.FindAsync(enrollmentDTO.Id);
+
+            if (enrollment == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            _context.Entry(enrollmentDTO).State = EntityState.Modified;
+            enrollment.Id = enrollmentDTO.Id;
+            enrollment.CourseId = enrollmentDTO.CourseId;
+            enrollment.Grade = enrollmentDTO.Grade;
+            enrollment.StudentId = enrollmentDTO.StudentId;
+            
+
+
+            _context.Entry(enrollment).State = EntityState.Modified;
+
 
             try
             {
@@ -59,54 +67,51 @@ namespace CoursePlatform.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!EnrollmentDTOExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest();
             }
 
             return NoContent();
         }
 
         [HttpPost]
-        public async Task<ActionResult<EnrollmentDTO>> PostEnrollmentDTO(EnrollmentDTO enrollmentDTO)
+        public async Task<ActionResult<Enrollment>> PostEnrollment(EnrollmentDTO enrollmentDTO)
         {
-            /*
-            _context.EnrollmentDTO.Add(enrollmentDTO);
+            Enrollment enrollment = new();
+
+            enrollment.Id = enrollmentDTO.Id;
+            enrollment.CourseId = enrollmentDTO.CourseId;
+            enrollment.Grade = enrollmentDTO.Grade;
+            enrollment.StudentId = enrollmentDTO.StudentId;
+
+            _context.Enrollments.Add(enrollment);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetEnrollmentDTO", new { id = enrollmentDTO.Id }, enrollmentDTO);
-            */
-            return Ok();
+            return CreatedAtAction("GetEnrollment", new { id = enrollmentDTO.Id }, enrollmentDTO);
+            
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEnrollmentDTO(int id)
+        public async Task<IActionResult> DeleteEnrollmentDTO(string id)
         {
-            /*
-            var enrollmentDTO = await _context.EnrollmentDTO.FindAsync(id);
-            if (enrollmentDTO == null)
+            
+            var enrollment = await _context.Enrollments.FindAsync(id);
+            if (enrollment == null)
             {
                 return NotFound();
             }
 
-            _context.EnrollmentDTO.Remove(enrollmentDTO);
+            _context.Enrollments.Remove(enrollment);
             await _context.SaveChangesAsync();
 
             return NoContent();
-            */
-            return Ok();
+            
 
         }
 
-        private bool EnrollmentDTOExists(int id)
+        private bool EnrollmentDTOExists(string id)
         {
-            //return _context.EnrollmentDTO.Any(e => e.Id == id);
-            return true;
+            return _context.Enrollments.Any(e => e.Id == id);
+            
         }
     }
 }
