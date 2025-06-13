@@ -23,12 +23,14 @@ namespace CoursePlatform.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EnrollmentDTO>>> GetEnrollmentDTO()
         {
-            return await _context.EnrollmentDTO.ToListAsync();
+            return Ok();
+            //return await _context.EnrollmentDTO.ToListAsync();
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<EnrollmentDTO>> GetEnrollmentDTO(int id)
         {
+            /*
             var enrollmentDTO = await _context.EnrollmentDTO.FindAsync(id);
 
             if (enrollmentDTO == null)
@@ -37,6 +39,8 @@ namespace CoursePlatform.Controllers
             }
 
             return enrollmentDTO;
+            */
+            return Ok();
         }
 
         [HttpPut("{id}")]
@@ -71,15 +75,19 @@ namespace CoursePlatform.Controllers
         [HttpPost]
         public async Task<ActionResult<EnrollmentDTO>> PostEnrollmentDTO(EnrollmentDTO enrollmentDTO)
         {
+            /*
             _context.EnrollmentDTO.Add(enrollmentDTO);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetEnrollmentDTO", new { id = enrollmentDTO.Id }, enrollmentDTO);
+            */
+            return Ok();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEnrollmentDTO(int id)
         {
+            /*
             var enrollmentDTO = await _context.EnrollmentDTO.FindAsync(id);
             if (enrollmentDTO == null)
             {
@@ -90,11 +98,15 @@ namespace CoursePlatform.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+            */
+            return Ok();
+
         }
 
         private bool EnrollmentDTOExists(int id)
         {
-            return _context.EnrollmentDTO.Any(e => e.Id == id);
+            //return _context.EnrollmentDTO.Any(e => e.Id == id);
+            return true;
         }
     }
 }

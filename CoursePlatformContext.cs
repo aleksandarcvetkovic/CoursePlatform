@@ -16,12 +16,6 @@ public class CoursePlatformContext : DbContext
         public DbSet<Student> Students { get; set; }
         public DbSet<Enrollment> Enrollments { get; set; }
 
-public DbSet<CoursePlatform.Models.EnrollmentDTO> EnrollmentDTO { get; set; } = default!;
-
-public DbSet<InstructorDTO> InstructorDTO { get; set; } = default!;
-
-public DbSet<CoursePlatform.Models.StudentDTO> StudentDTO { get; set; } = default!;
-/*
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Enrollment>()
@@ -39,5 +33,5 @@ public DbSet<CoursePlatform.Models.StudentDTO> StudentDTO { get; set; } = defaul
                 .WithMany(i => i.Courses)
                 .HasForeignKey(c => c.InstructorId);
         }
-        */
+        
 }

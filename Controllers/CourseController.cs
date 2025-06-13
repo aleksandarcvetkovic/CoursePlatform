@@ -16,6 +16,19 @@ public class CourseController : ControllerBase
         this._context = context;
     }
 
+    [HttpGet("check-db")]
+    public IActionResult CheckDatabase()
+    {
+        try
+        {
+            var canConnect = _context.Database.CanConnect();
+            return Ok(new { connected = canConnect });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { connected = false, error = ex.Message });
+        }
+    }
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Course>>> GetCourses()
     {
@@ -23,7 +36,7 @@ public class CourseController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Course>> GetCourse(long id)
+    public async Task<ActionResult<Course>> GetCourse(string id)
     {
         return Ok("working got= " + id);
     }
@@ -35,30 +48,30 @@ public class CourseController : ControllerBase
     }
 
     [HttpPut]
-    public async Task<IActionResult> PutCourse(long id, Course course)
+    public async Task<IActionResult> PutCourse(string id, Course course)
     {
-        if (id != course.CourseId)
+        if (id != course.Id)
         {
             return BadRequest();
         }
 
         return NoContent();
     }
-/*
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteCourseDTO(int id)
     {
-        var courseDTO = await _context.courseDTO.FindAsync(id);
-        if (instructorDTO == null)
+        var courseDTO = await _context.Courses.FindAsync(id);
+        if (courseDTO == null)
         {
             return NotFound();
         }
 
-        _context.InstructorDTO.Remove(instructorDTO);
+        _context.Courses.Remove(courseDTO);
         await _context.SaveChangesAsync();
 
         return NoContent();
     }
-*/
+
 
 }
