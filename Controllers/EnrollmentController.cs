@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CoursePlatform.Models;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CoursePlatform.Controllers
 {
@@ -21,13 +22,14 @@ namespace CoursePlatform.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Enrollment>>> GetEnrollmentDTO()
+        public async Task<ActionResult<IEnumerable<EnrollmentDTO>>> GetEnrollmentDTO()
         {
-            return await _context.Enrollments.ToListAsync();
+            var enrollments = await _context.Enrollments.ToListAsync();
+            return Ok(enrollments.ToDTOs());
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Enrollment>> GetEnrollment(string id)
+        public async Task<ActionResult<EnrollmentDTO>> GetEnrollment(string id)
         {
             
             var enrollment = await _context.Enrollments.FindAsync(id);
@@ -37,29 +39,41 @@ namespace CoursePlatform.Controllers
                 return NotFound();
             }
 
-            return enrollment;
+            return enrollment.ToEnrolmentDTO();
            
         }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutEnrollment(EnrollmentDTO enrollmentDTO)
+        [HttpGet("EnrollmnetStudentCourse/{id}")]
+        public async Task<ActionResult<EnrollmentWithStudentCourseDTO>> GetEnrollmentWithStudentCourseDTO(string id)
         {
-            var enrollment = await _context.Enrollments.FindAsync(enrollmentDTO.Id);
+            
+            var enrollment = _context.Enrollments.Include(e => e.Course).Include(e => e.Student).FirstOrDefault(e => e.Id == id);
 
             if (enrollment == null)
             {
                 return NotFound();
             }
 
-            enrollment.Id = enrollmentDTO.Id;
-            enrollment.CourseId = enrollmentDTO.CourseId;
-            enrollment.Grade = enrollmentDTO.Grade;
-            enrollment.StudentId = enrollmentDTO.StudentId;
+            return enrollment.ToEnrollmentWithStudentCourseDTO();
+           
+        }
+
+        [HttpPut("{id}/{grade}")]
+        public async Task<IActionResult> PutEnrollment(string id, int grade)
+        {
+            var enrollment = await _context.Enrollments.FindAsync(id);
+
+            if (enrollment == null)
+            {
+                return NotFound();
+            }
+
+
+            enrollment.UpdateFromDTO(new EnrollmentGradeRequestDTO
+            {
+                Id = id,
+                Grade = grade
+            });
             
-
-
-            _context.Entry(enrollment).State = EntityState.Modified;
-
 
             try
             {
@@ -76,14 +90,11 @@ namespace CoursePlatform.Controllers
         [HttpPost]
         public async Task<ActionResult<Enrollment>> PostEnrollment(EnrollmentDTO enrollmentDTO)
         {
-            Enrollment enrollment = new();
 
-            enrollment.Id = enrollmentDTO.Id;
-            enrollment.CourseId = enrollmentDTO.CourseId;
-            enrollment.Grade = enrollmentDTO.Grade;
-            enrollment.StudentId = enrollmentDTO.StudentId;
+            var newEnrollment = enrollmentDTO.ToEnrolment();
+            newEnrollment.EnrolledOn = DateTime.Now;
 
-            _context.Enrollments.Add(enrollment);
+            _context.Enrollments.Add(newEnrollment);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetEnrollment", new { id = enrollmentDTO.Id }, enrollmentDTO);

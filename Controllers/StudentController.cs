@@ -22,24 +22,41 @@ namespace CoursePlatform.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Student>>> GetStudentDTO()
+        public async Task<ActionResult<IEnumerable<StudentDTO>>> GetStudentDTO()
         {
-            return await _context.Students.ToListAsync();
-            
+            var students = await _context.Students.ToListAsync();
+            var studentsDTO = students.ToDTOs();
+            return Ok(studentsDTO);            
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Student>> GetStudentDTO(string id)
+        public async Task<ActionResult<StudentDTO>> GetStudentDTO(string id)
         {
             
-            var studentDTO = await _context.Students.FindAsync(id);
+            var student = await _context.Students.FindAsync(id);
 
-            if (studentDTO == null)
+            if (student == null)
             {
                 return NotFound();
             }
 
-            return studentDTO;
+            return student.ToStudentDTO();
+            
+        }
+
+
+        [HttpGet("StudentWithEnrollments/{id}")]
+        public async Task<ActionResult<StudentWithEnrolmentsDTO>> GetStudentWithEnrollmentsDTO(string id)
+        {
+            
+            var student = await _context.Students.Include(s => s.Enrollments).FirstOrDefaultAsync(s => s.Id == id);
+
+            if (student == null)
+            {
+                return NotFound();
+            }
+
+            return student.ToStudentWithEnrolmentsDTO();
             
         }
 
@@ -55,10 +72,7 @@ namespace CoursePlatform.Controllers
                 return NotFound();
             }
 
-            studentEntry.Email = studentDTO.Email;
-            studentEntry.Name = studentDTO.Name;
-
-            _context.Entry(studentEntry).State = EntityState.Modified;
+            studentEntry.UpdateFromDTO(studentDTO);
 
             try
             {
@@ -76,12 +90,7 @@ namespace CoursePlatform.Controllers
         public async Task<ActionResult<StudentDTO>> PostStudentDTO(StudentDTO studentDTO)
         {
 
-            Student student = new();
-            student.Email = studentDTO.Email;
-            student.Id = studentDTO.Id;
-            student.Name = studentDTO.Name;
-
-            _context.Students.Add(student);
+            _context.Students.Add(studentDTO.ToStudent());
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetStudentDTO", new { id = studentDTO.Id }, studentDTO);

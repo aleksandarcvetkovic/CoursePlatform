@@ -21,15 +21,15 @@ namespace CoursePlatform.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Instructor>>> GetInstructor()
+        public async Task<ActionResult<IEnumerable<InstructorDTO>>> GetInstructor()
         {
-            return await _context.Instructors.ToListAsync();
-            
-
+            var instructors = _context.Instructors.ToList();
+            var instructorsDTOs = instructors.ToDTOs();
+            return Ok(instructorsDTOs);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Instructor>> GetInstructor(string id)
+        public async Task<ActionResult<InstructorDTO>> GetInstructor(string id)
         {
             
             var instructor = await _context.Instructors.FindAsync(id);
@@ -39,11 +39,25 @@ namespace CoursePlatform.Controllers
                 return NotFound();
             }
 
-            return instructor;
+            return instructor.ToInstructorDTO();
+            
+        }
+        [HttpGet("withCourses/{id}")]
+        public async Task<ActionResult<InstructorWithCoursesDTO>> GetInstructorWithCourses(string id)
+        {
+
+            var instructor = _context.Instructors.Include(i => i.Courses).FirstOrDefault(i => i.Id == id);
+
+            if (instructor == null)
+            {
+                return NotFound();
+            }
+
+            return instructor.ToInstructorWithCoursesDTO();
             
         }
 
-        [HttpPut("{id}")]
+        [HttpPut]
         public async Task<IActionResult> PutInstructorDTO(InstructorDTO instructorDTO)
         {
             
@@ -54,11 +68,7 @@ namespace CoursePlatform.Controllers
                 return NotFound();
             }
 
-            instructor.Email = instructorDTO.Email;
-            instructor.Name = instructor.Name;
-            instructor.Id = instructor.Id;
-
-            _context.Entry(instructor).State = EntityState.Modified;
+            instructor.UpdateFromDTO(instructorDTO);
 
             try
             {
@@ -77,12 +87,7 @@ namespace CoursePlatform.Controllers
         public async Task<ActionResult<InstructorDTO>> PostInstructor(InstructorDTO instructorDTO)
         {
 
-            Instructor instructor = new();
-            instructor.Email = instructorDTO.Email;
-            instructor.Name = instructorDTO.Name;
-            instructor.Id = instructorDTO.Id;
-
-            _context.Instructors.Add(instructor);
+            _context.Instructors.Add(instructorDTO.ToInstructor());
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetInstructor", new { id = instructorDTO.Id }, instructorDTO);

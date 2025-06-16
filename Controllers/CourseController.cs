@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CoursePlatform.Models;
 
+
 namespace CoursePlatform.Controllers;
 
 [Microsoft.AspNetCore.Mvc.Route("api/[controller]")]
@@ -33,69 +34,79 @@ public class CourseController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Course>>> GetCourses()
     {
-        return await _context.Courses.ToListAsync();
+        var courses = await _context.Courses.Include(c=>c.Instructor).ToListAsync();
+        var cousesDTOs = courses.ToRespondeDTOs();
+        return Ok(cousesDTOs);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Course>> GetCourse(string id)
+    public async Task<ActionResult<CourseResponseDTO>> GetCourse(string id)
     {
         var courseDTO = await _context.Courses.FindAsync(id);
 
-            if (courseDTO == null)
-            {
-                return NotFound();
-            }
+        if (courseDTO == null)
+        {
+            return NotFound();
+        }
 
-            return courseDTO;
+        return courseDTO.ToRespondeDTO();
+    }
+
+    [HttpGet("withInstructor/{id}")]
+    public async Task<ActionResult<CourseWithInstructorDTO>> GetCourseWithInstructor(string id)
+    {
+        var course = _context.Courses.Include(c => c.Instructor).FirstOrDefault(c => c.Id == id);
+        
+        if (course == null)
+        {
+            return NotFound();
+        }
+        
+        return course.ToCourseWithInstructor();
     }
 
     [HttpPost]
-    public async Task<ActionResult<Course>> PostCourse(CourseDTO courseDTO)
+    public async Task<ActionResult<Course>> PostCourse(CourseRequestDTO courseDTO)
     {
 
-            Course course = new();
+        var instructor = await _context.Instructors.FindAsync(courseDTO.InstructorId);
 
-            course.Id = courseDTO.Id;
-            course.Title = courseDTO.Title;
-            course.Description = courseDTO.Description;
-            course.InstructorId = courseDTO.InstructorId;
+        if (instructor == null)
+            return BadRequest("Instruktor sa datim ID ne postoji");
+
+        var course = courseDTO.ToCourse();
+        //course.Instructor = instructor;
+
+        _context.Courses.Add(course);
+        await _context.SaveChangesAsync();
+
+        return CreatedAtAction("GetCourse", new { id = courseDTO.Id }, courseDTO);
         
-            _context.Courses.Add(course);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetCourse", new { id = courseDTO.Id }, courseDTO);
-            
            
     }
 
     [HttpPut]
-    public async Task<IActionResult> PutCourse(CourseDTO courseDTO)
+    public async Task<IActionResult> PutCourse(CourseRequestDTO courseDTO)
     {
-            var courseEntry = await _context.Courses.FindAsync(courseDTO.Id);
+        var courseEntry = await _context.Courses.FindAsync(courseDTO.Id);
 
-            if (courseEntry == null)
-            {
-                return NotFound();
-            }
+        if (courseEntry == null)
+        {
+            return NotFound();
+        }
 
-            courseEntry.Id = courseDTO.Id;
-            courseEntry.Title = courseDTO.Title;
-            courseEntry.Description = courseDTO.Description;
-            courseEntry.InstructorId = courseEntry.InstructorId;
-            
+        courseEntry.UpdateFromDTO(courseDTO);
+        
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception)
+        {
+            return BadRequest();
+        }
 
-            _context.Entry(courseEntry).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                return BadRequest();
-            }
-
-            return NoContent();
+        return NoContent();
     }
 
     [HttpDelete("{id}")]
