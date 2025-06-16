@@ -24,36 +24,37 @@ namespace CoursePlatform.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EnrollmentDTO>>> GetEnrollmentDTO()
         {
-            var enrollments = await _context.Enrollments.ToListAsync();
-            return Ok(enrollments.ToDTOs());
+            var enrollments = await _context.Enrollments.Select(e => e.ToEnrolmentDTO()).ToListAsync();
+            return Ok(enrollments);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<EnrollmentDTO>> GetEnrollment(string id)
         {
             
-            var enrollment = await _context.Enrollments.FindAsync(id);
+            var enrollment = _context.Enrollments.Select(e => e.ToEnrolmentDTO()).FirstOrDefault(e => e.Id == id);
 
             if (enrollment == null)
             {
                 return NotFound();
             }
 
-            return enrollment.ToEnrolmentDTO();
+            return enrollment;
            
         }
+
         [HttpGet("EnrollmnetStudentCourse/{id}")]
         public async Task<ActionResult<EnrollmentWithStudentCourseDTO>> GetEnrollmentWithStudentCourseDTO(string id)
         {
             
-            var enrollment = _context.Enrollments.Include(e => e.Course).Include(e => e.Student).FirstOrDefault(e => e.Id == id);
+            var enrollment = _context.Enrollments.Include(e => e.Course).Include(e => e.Student).Select(e => e.ToEnrollmentWithStudentCourseDTO()).FirstOrDefault(e => e.Id == id);
 
             if (enrollment == null)
             {
                 return NotFound();
             }
 
-            return enrollment.ToEnrollmentWithStudentCourseDTO();
+            return enrollment;
            
         }
 

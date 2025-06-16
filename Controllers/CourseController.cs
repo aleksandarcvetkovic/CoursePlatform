@@ -34,35 +34,34 @@ public class CourseController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Course>>> GetCourses()
     {
-        var courses = await _context.Courses.Include(c=>c.Instructor).ToListAsync();
-        var cousesDTOs = courses.ToRespondeDTOs();
-        return Ok(cousesDTOs);
+        var coursesDTOs = await _context.Courses.Include(c=>c.Instructor).Select(c => c.ToRespondeDTO()).ToListAsync();
+        return Ok(coursesDTOs);
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<CourseResponseDTO>> GetCourse(string id)
     {
-        var courseDTO = await _context.Courses.FindAsync(id);
+        var courseDTO = _context.Courses.Select(c => c.ToRespondeDTO()).FirstOrDefault(c => c.Id == id);
 
         if (courseDTO == null)
         {
             return NotFound();
         }
 
-        return courseDTO.ToRespondeDTO();
+        return courseDTO;
     }
 
     [HttpGet("withInstructor/{id}")]
     public async Task<ActionResult<CourseWithInstructorDTO>> GetCourseWithInstructor(string id)
     {
-        var course = _context.Courses.Include(c => c.Instructor).FirstOrDefault(c => c.Id == id);
+        var course = _context.Courses.Include(c => c.Instructor).Select(c => c.ToCourseWithInstructor()).FirstOrDefault(c => c.Id == id);
         
         if (course == null)
         {
             return NotFound();
         }
         
-        return course.ToCourseWithInstructor();
+        return course;
     }
 
     [HttpPost]
@@ -75,7 +74,6 @@ public class CourseController : ControllerBase
             return BadRequest("Instruktor sa datim ID ne postoji");
 
         var course = courseDTO.ToCourse();
-        //course.Instructor = instructor;
 
         _context.Courses.Add(course);
         await _context.SaveChangesAsync();

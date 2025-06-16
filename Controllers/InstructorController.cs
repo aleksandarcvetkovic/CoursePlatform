@@ -23,8 +23,7 @@ namespace CoursePlatform.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<InstructorDTO>>> GetInstructor()
         {
-            var instructors = _context.Instructors.ToList();
-            var instructorsDTOs = instructors.ToDTOs();
+            var instructorsDTOs = _context.Instructors.Select(i => i.ToInstructorDTO()).ToList();
             return Ok(instructorsDTOs);
         }
 
@@ -32,28 +31,28 @@ namespace CoursePlatform.Controllers
         public async Task<ActionResult<InstructorDTO>> GetInstructor(string id)
         {
             
-            var instructor = await _context.Instructors.FindAsync(id);
+            var instructor =  _context.Instructors.Select(i => i.ToInstructorDTO()).FirstOrDefault(i => i.Id == id);
 
             if (instructor == null)
             {
                 return NotFound();
             }
 
-            return instructor.ToInstructorDTO();
+            return instructor;
             
         }
         [HttpGet("withCourses/{id}")]
         public async Task<ActionResult<InstructorWithCoursesDTO>> GetInstructorWithCourses(string id)
         {
 
-            var instructor = _context.Instructors.Include(i => i.Courses).FirstOrDefault(i => i.Id == id);
+            var instructor = _context.Instructors.Include(i => i.Courses).Select(i => i.ToInstructorWithCoursesDTO()).FirstOrDefault(i => i.Id == id);
 
             if (instructor == null)
             {
                 return NotFound();
             }
 
-            return instructor.ToInstructorWithCoursesDTO();
+            return instructor;
             
         }
 

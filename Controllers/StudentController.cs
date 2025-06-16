@@ -24,23 +24,22 @@ namespace CoursePlatform.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StudentDTO>>> GetStudentDTO()
         {
-            var students = await _context.Students.ToListAsync();
-            var studentsDTO = students.ToDTOs();
-            return Ok(studentsDTO);            
+            var studentsDTO = await _context.Students.Select(s => s.ToStudentDTO()).ToListAsync();
+            return Ok(studentsDTO);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<StudentDTO>> GetStudentDTO(string id)
         {
-            
-            var student = await _context.Students.FindAsync(id);
+
+            var student =  _context.Students.Select(s => s.ToStudentDTO()).FirstOrDefault(s => s.Id == id);
 
             if (student == null)
             {
                 return NotFound();
             }
 
-            return student.ToStudentDTO();
+            return student;
             
         }
 
@@ -49,14 +48,14 @@ namespace CoursePlatform.Controllers
         public async Task<ActionResult<StudentWithEnrolmentsDTO>> GetStudentWithEnrollmentsDTO(string id)
         {
             
-            var student = await _context.Students.Include(s => s.Enrollments).FirstOrDefaultAsync(s => s.Id == id);
+            var student = await _context.Students.Include(s => s.Enrollments).Select(s => s.ToStudentWithEnrolmentsDTO()).FirstOrDefaultAsync(s => s.Id == id);
 
             if (student == null)
             {
                 return NotFound();
             }
 
-            return student.ToStudentWithEnrolmentsDTO();
+            return student;
             
         }
 
