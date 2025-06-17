@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Components.Web;
 
 public static class StudentExtensions
 {
-    public static StudentDTO ToStudentDTO(this Student student)
+    public static StudentResponseDTO ToStudentResponseDTO(this Student student)
     {
-        return new StudentDTO
+        return new StudentResponseDTO
         {
             Id = student.Id,
             Name = student.Name,
@@ -16,7 +16,7 @@ public static class StudentExtensions
 
 
     }
-    public static Student ToStudent(this StudentDTO studentDTO)
+    public static Student ToStudent(this StudentResponseDTO studentDTO)
     {
         return new Student
         {
@@ -26,6 +26,16 @@ public static class StudentExtensions
 
         };
     }
+    public static Student ToStudent(this StudentRequestDTO studentDTO)
+    {
+        return new Student
+        {
+            Name = studentDTO.Name,
+            Email = studentDTO.Email,
+
+        };
+    }
+
     public static StudentWithEnrolmentsDTO ToStudentWithEnrolmentsDTO(this Student student)
     {
 
@@ -39,17 +49,23 @@ public static class StudentExtensions
 
     }
 
-    public static void UpdateFromDTO(this Student student, StudentDTO studentDTO)
+    public static void UpdateFromDTO(this Student student, StudentResponseDTO studentDTO)
     {
         student.Id = studentDTO.Id;
         student.Name = studentDTO.Name;
         student.Email = studentDTO.Email;
     }
 
-    
-
-    public static IEnumerable<StudentDTO> ToDTOs(this IEnumerable<Student> students)
+    public static void UpdateFromDTO(this Student student, StudentRequestDTO studentDTO)
     {
-        return students.Select(c => c.ToStudentDTO());
+        student.Name = studentDTO.Name;
+        student.Email = studentDTO.Email;
     }
+
+
+    public static IEnumerable<StudentResponseDTO> ToDTOs(this IEnumerable<Student> students)
+    {
+        return students.Select(c => c.ToStudentResponseDTO());
+    }
+    
 }

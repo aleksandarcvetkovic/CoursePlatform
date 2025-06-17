@@ -1,8 +1,11 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace CoursePlatform.Models;
 
 public class Enrollment
 {
-    public string Id { get; set; }
+    [Key]
+    public string Id { get; set; } = Guid.NewGuid().ToString();
 
     public string CourseId { get; set; }
     public Course Course { get; set; }

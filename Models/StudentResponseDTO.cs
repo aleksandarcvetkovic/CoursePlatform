@@ -1,5 +1,5 @@
 namespace CoursePlatform.Models;
-public class StudentDTO
+public class StudentResponseDTO
 {
     public string Id { get; set; }
     public string Name { get; set; }

@@ -21,22 +21,22 @@ namespace CoursePlatform.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<InstructorDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<InstructorResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<InstructorDTO>>> GetInstructor()
+        public async Task<ActionResult<IEnumerable<InstructorResponseDTO>>> GetInstructor()
         {
-            var instructorsDTOs = _context.Instructors.Select(i => i.ToInstructorDTO()).ToList();
+            var instructorsDTOs = _context.Instructors.Select(i => i.ToInstructorResponseDTO()).ToList();
             return Ok(instructorsDTOs);
         }
 
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(InstructorDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(InstructorResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<InstructorDTO>> GetInstructor(string id)
+        public async Task<ActionResult<InstructorResponseDTO>> GetInstructor(string id)
         {
 
-            var instructor = _context.Instructors.Select(i => i.ToInstructorDTO()).FirstOrDefault(i => i.Id == id);
+            var instructor = _context.Instructors.Select(i => i.ToInstructorResponseDTO()).FirstOrDefault(i => i.Id == id);
 
             if (instructor == null)
             {
@@ -64,22 +64,22 @@ namespace CoursePlatform.Controllers
 
         }
 
-        [HttpPut]
+        [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> PutInstructorDTO(InstructorDTO instructorDTO)
+        public async Task<IActionResult> PutInstructorDTO(string id, InstructorRequestDTO instructorRequestDTO)
         {
 
-            var instructor = await _context.Instructors.FindAsync(instructorDTO.Id);
+            var instructor = await _context.Instructors.FindAsync(id);
 
             if (instructor == null)
             {
                 return NotFound();
             }
 
-            instructor.UpdateFromDTO(instructorDTO);
+            instructor.UpdateFromDTO(instructorRequestDTO);
 
             try
             {
@@ -95,17 +95,23 @@ namespace CoursePlatform.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(InstructorDTO), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(InstructorResponseDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<InstructorDTO>> PostInstructor(InstructorDTO instructorDTO)
+        public async Task<ActionResult<InstructorResponseDTO>> PostInstructor(InstructorRequestDTO instructorRequestDTO)
         {
 
-            _context.Instructors.Add(instructorDTO.ToInstructor());
+            var instructor = instructorRequestDTO.ToInstructor();
+            _context.Instructors.Add(instructor);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetInstructor", new { id = instructorDTO.Id }, instructorDTO);
+
+            if (instructor== null)
+            {
+                return BadRequest("Instructor could not be created.");
+            }
+            
+            return CreatedAtAction("GetInstructor", new { id = instructor.Id }, instructor.ToInstructorResponseDTO());
 
         }
 

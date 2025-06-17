@@ -22,22 +22,22 @@ namespace CoursePlatform.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<EnrollmentDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<EnrollmentResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<EnrollmentDTO>>> GetEnrollmentDTO()
+        public async Task<ActionResult<IEnumerable<EnrollmentResponseDTO>>> GetEnrollmentDTO()
         {
-            var enrollments = await _context.Enrollments.Select(e => e.ToEnrolmentDTO()).ToListAsync();
+            var enrollments = await _context.Enrollments.Select(e => e.ToEnrolmentResponseDTO()).ToListAsync();
             return Ok(enrollments);
         }
 
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(EnrollmentDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(EnrollmentResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<EnrollmentDTO>> GetEnrollment(string id)
+        public async Task<ActionResult<EnrollmentResponseDTO>> GetEnrollment(string id)
         {
 
-            var enrollment = _context.Enrollments.Select(e => e.ToEnrolmentDTO()).FirstOrDefault(e => e.Id == id);
+            var enrollment = _context.Enrollments.Select(e => e.ToEnrolmentResponseDTO()).FirstOrDefault(e => e.Id == id);
 
             if (enrollment == null)
             {
@@ -101,20 +101,19 @@ namespace CoursePlatform.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(Enrollment), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(EnrollmentResponseDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<Enrollment>> PostEnrollment(EnrollmentDTO enrollmentDTO)
+        public async Task<ActionResult<Enrollment>> PostEnrollment(EnrollmentRequestDTO enrollmentRequestDTO)
         {
 
-            var newEnrollment = enrollmentDTO.ToEnrolment();
+            var newEnrollment = enrollmentRequestDTO.ToEnrolment();
             newEnrollment.EnrolledOn = DateTime.Now;
 
             _context.Enrollments.Add(newEnrollment);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetEnrollment", new { id = enrollmentDTO.Id }, enrollmentDTO);
+            return CreatedAtAction("GetEnrollment", new { id = newEnrollment.Id }, newEnrollment.ToEnrolmentResponseDTO());
 
         }
 

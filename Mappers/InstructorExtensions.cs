@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Components.Web;
 
 public static class InstructorExtensions
 {
-    public static InstructorDTO ToInstructorDTO(this Instructor instructor)
+    public static InstructorResponseDTO ToInstructorResponseDTO(this Instructor instructor)
     {
-        return new InstructorDTO
+        return new InstructorResponseDTO
         {
             Id = instructor.Id,
             Name = instructor.Name,
@@ -16,7 +16,7 @@ public static class InstructorExtensions
 
 
     }
-    public static Instructor ToInstructor(this InstructorDTO instructorDTO)
+    public static Instructor ToInstructor(this InstructorResponseDTO instructorDTO)
     {
         return new Instructor
         {
@@ -26,6 +26,16 @@ public static class InstructorExtensions
 
         };
     }
+    public static Instructor ToInstructor(this InstructorRequestDTO instructorDTO)
+    {
+        return new Instructor
+        {
+            Name = instructorDTO.Name,
+            Email = instructorDTO.Email,
+
+        };
+    }
+  
     public static InstructorWithCoursesDTO ToInstructorWithCoursesDTO(this Instructor instructor)
     {
 
@@ -39,17 +49,22 @@ public static class InstructorExtensions
 
     }
 
-    public static void UpdateFromDTO(this Instructor instructor, InstructorDTO instructorDTO)
+    public static void UpdateFromDTO(this Instructor instructor, InstructorResponseDTO instructorDTO)
     {
         instructor.Id = instructorDTO.Id;
         instructor.Name = instructorDTO.Name;
         instructor.Email = instructorDTO.Email;
     }
 
-    
-
-    public static IEnumerable<InstructorDTO> ToDTOs(this IEnumerable<Instructor> instructors)
+    public static void UpdateFromDTO(this Instructor instructor, InstructorRequestDTO instructorDTO)
     {
-        return instructors.Select(c => c.ToInstructorDTO());
+        instructor.Name = instructorDTO.Name;
+        instructor.Email = instructorDTO.Email;
+    }
+
+
+    public static IEnumerable<InstructorResponseDTO> ToDTOs(this IEnumerable<Instructor> instructors)
+    {
+        return instructors.Select(c => c.ToInstructorResponseDTO());
     }
 }

@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Components.Web;
 
 public static class EnrolmentExtensions
 {
-    public static EnrollmentDTO ToEnrolmentDTO(this Enrollment enrollment)
+    public static EnrollmentResponseDTO ToEnrolmentResponseDTO(this Enrollment enrollment)
     {
-        return new EnrollmentDTO
+        return new EnrollmentResponseDTO
         {
             Id = enrollment.Id,
             CourseId = enrollment.CourseId,
@@ -23,8 +23,8 @@ public static class EnrolmentExtensions
         return new EnrollmentWithStudentCourseDTO
         {
             Id = enrollment.Id,
-            EnrolmentCourse = enrollment.Course.ToRespondeDTO(),
-            EnrolmentStudent = enrollment.Student.ToStudentDTO(),
+            EnrolmentCourse = enrollment.Course.ToResponseDTO(),
+            EnrolmentStudent = enrollment.Student.ToStudentResponseDTO(),
             EnrolledOn = enrollment.EnrolledOn,
             Grade = enrollment.Grade,
             
@@ -33,7 +33,7 @@ public static class EnrolmentExtensions
 
 
     }
-    public static Enrollment ToEnrolment(this EnrollmentDTO enrollmentDTO)
+    public static Enrollment ToEnrolment(this EnrollmentResponseDTO enrollmentDTO)
     {
         return new Enrollment
         {
@@ -45,9 +45,20 @@ public static class EnrolmentExtensions
 
         };
     }
+    public static Enrollment ToEnrolment(this EnrollmentRequestDTO enrollmentDTO)
+    {
+        return new Enrollment
+        {
+            CourseId = enrollmentDTO.CourseId,
+            StudentId = enrollmentDTO.StudentId,
+            EnrolledOn = DateTime.UtcNow, // Set current date as enrolled date
+            Grade = enrollmentDTO.Grade
+
+        };
+    }
 
 
-    public static void UpdateFromDTO(this Enrollment enrollment, EnrollmentDTO enrollmentDTO)
+    public static void UpdateFromDTO(this Enrollment enrollment, EnrollmentResponseDTO enrollmentDTO)
     {
         enrollment.Id = enrollmentDTO.Id;
         enrollment.CourseId = enrollmentDTO.CourseId;
@@ -64,8 +75,8 @@ public static class EnrolmentExtensions
 
     
 
-    public static IEnumerable<EnrollmentDTO> ToDTOs(this IEnumerable<Enrollment> enrollments)
+    public static IEnumerable<EnrollmentResponseDTO> ToDTOs(this IEnumerable<Enrollment> enrollments)
     {
-        return enrollments.Select(e => e.ToEnrolmentDTO());
+        return enrollments.Select(e => e.ToEnrolmentResponseDTO());
     }
 }
