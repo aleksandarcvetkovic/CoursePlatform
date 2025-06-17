@@ -22,6 +22,8 @@ namespace CoursePlatform.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<StudentDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]        
         public async Task<ActionResult<IEnumerable<StudentDTO>>> GetStudentDTO()
         {
             var studentsDTO = await _context.Students.Select(s => s.ToStudentDTO()).ToListAsync();
@@ -29,10 +31,13 @@ namespace CoursePlatform.Controllers
         }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(StudentDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<StudentDTO>> GetStudentDTO(string id)
         {
 
-            var student =  _context.Students.Select(s => s.ToStudentDTO()).FirstOrDefault(s => s.Id == id);
+            var student = _context.Students.Select(s => s.ToStudentDTO()).FirstOrDefault(s => s.Id == id);
 
             if (student == null)
             {
@@ -40,14 +45,17 @@ namespace CoursePlatform.Controllers
             }
 
             return student;
-            
+
         }
 
 
         [HttpGet("StudentWithEnrollments/{id}")]
+        [ProducesResponseType(typeof(StudentWithEnrolmentsDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<StudentWithEnrolmentsDTO>> GetStudentWithEnrollmentsDTO(string id)
         {
-            
+
             var student = await _context.Students.Include(s => s.Enrollments).Select(s => s.ToStudentWithEnrolmentsDTO()).FirstOrDefaultAsync(s => s.Id == id);
 
             if (student == null)
@@ -56,15 +64,19 @@ namespace CoursePlatform.Controllers
             }
 
             return student;
-            
+
         }
 
         [HttpPut]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> PutStudentDTO(StudentDTO studentDTO)
         {
-            
-        
-            var studentEntry= await _context.Students.FindAsync(studentDTO.Id);
+
+
+            var studentEntry = await _context.Students.FindAsync(studentDTO.Id);
 
             if (studentEntry == null)
             {
@@ -86,6 +98,10 @@ namespace CoursePlatform.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(StudentDTO), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<StudentDTO>> PostStudentDTO(StudentDTO studentDTO)
         {
 
@@ -93,14 +109,17 @@ namespace CoursePlatform.Controllers
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetStudentDTO", new { id = studentDTO.Id }, studentDTO);
-            
-           
+
+
         }
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteStudentDTO(string id)
         {
-            
+
             var student = await _context.Students.FindAsync(id);
             if (student == null)
             {
@@ -111,7 +130,7 @@ namespace CoursePlatform.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
-            
+
         }
 
         private bool StudentDTOExists(string id)
