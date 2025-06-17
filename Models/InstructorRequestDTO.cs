@@ -1,6 +1,5 @@
-public class InstructorDTO
+public class InstructorRequestDTO
 {
-    public string Id { get; set; }
     public string Name { get; set; }
     public string Email { get; set; }
 

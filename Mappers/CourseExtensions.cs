@@ -3,7 +3,7 @@ using CoursePlatform.Models;
 
 public static class CourseExtensions
 {
-    public static CourseResponseDTO ToRespondeDTO(this Course course)
+    public static CourseResponseDTO ToResponseDTO(this Course course)
     {
         return new CourseResponseDTO
         {
@@ -37,7 +37,6 @@ public static class CourseExtensions
 
     public static void UpdateFromDTO(this Course course, CourseRequestDTO courseDTO)
     {
-        course.Id = courseDTO.Id;
         course.Title = courseDTO.Title;
         course.Description = courseDTO.Description;
         course.InstructorId = courseDTO.InstructorId;
@@ -50,7 +49,7 @@ public static class CourseExtensions
             Id = course.Id,
             Title = course.Title,
             Description = course.Description,
-            CourseInstructor = new InstructorDTO
+            CourseInstructor = new InstructorResponseDTO
             {
                 Id = course.InstructorId,
                 Name = course.Instructor.Name,
@@ -63,7 +62,6 @@ public static class CourseExtensions
     {
         return new Course
         {
-            Id = courseDTO.Id,
             Title = courseDTO.Title,
             Description = courseDTO.Description,
             InstructorId = courseDTO.InstructorId
@@ -73,6 +71,6 @@ public static class CourseExtensions
 
     public static IEnumerable<CourseResponseDTO> ToRespondeDTOs(this IEnumerable<Course> courses)
     {
-        return courses.Select(c => c.ToRespondeDTO());
+        return courses.Select(c => c.ToResponseDTO());
     }
 }

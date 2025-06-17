@@ -1,8 +1,7 @@
 namespace CoursePlatform.Models;
 
-public class EnrollmentDTO
+public class EnrollmentRequestDTO
 {
-    public string Id { get; set; }
 
     public string CourseId { get; set; }
 
