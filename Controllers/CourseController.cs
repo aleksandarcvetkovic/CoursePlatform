@@ -1,20 +1,19 @@
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using CoursePlatform.Models;
-
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CoursePlatform.Controllers;
 
-[Microsoft.AspNetCore.Mvc.Route("api/[controller]")]
+[Route("api/[controller]")]
 [ApiController]
 public class CourseController : ControllerBase
 {
-    private readonly CoursePlatformContext _context;
+    private readonly ICourseService _courseService;
 
-    public CourseController(CoursePlatformContext context)
+    public CourseController(ICourseService courseService)
     {
-        this._context = context;
+        _courseService = courseService;
     }
 
     [HttpGet("check-db")]
@@ -22,23 +21,16 @@ public class CourseController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public IActionResult CheckDatabase()
     {
-        try
-        {
-            var canConnect = _context.Database.CanConnect();
-            return Ok(new { connected = canConnect });
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { connected = false, error = ex.Message });
-        }
+        var canConnect = _courseService.CanConnectToDatabase();
+        return Ok(new { connected = canConnect });
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(IEnumerable<CourseWithInstructorDTO>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<CourseResponseDTO>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<IEnumerable<Course>>> GetCourses()
+    public async Task<ActionResult<IEnumerable<CourseResponseDTO>>> GetCourses()
     {
-        var coursesDTOs = await _context.Courses.Include(c => c.Instructor).Select(c => c.ToResponseDTO()).ToListAsync();
+        var coursesDTOs = await _courseService.GetAllCoursesAsync();
         return Ok(coursesDTOs);
     }
 
@@ -48,14 +40,8 @@ public class CourseController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<CourseResponseDTO>> GetCourse(string id)
     {
-        var courseDTO = _context.Courses.Select(c => c.ToResponseDTO()).FirstOrDefault(c => c.Id == id);
-
-        if (courseDTO == null)
-        {
-            return NotFound();
-        }
-
-        return courseDTO;
+        var courseDTO = await _courseService.GetCourseAsync(id);
+        return Ok(courseDTO);
     }
 
     [HttpGet("withInstructor/{id}")]
@@ -64,36 +50,18 @@ public class CourseController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<CourseWithInstructorDTO>> GetCourseWithInstructor(string id)
     {
-        var course = _context.Courses.Include(c => c.Instructor).Select(c => c.ToCourseWithInstructor()).FirstOrDefault(c => c.Id == id);
-
-        if (course == null)
-        {
-            return NotFound();
-        }
-
-        return course;
+        var course = await _courseService.GetCourseWithInstructorAsync(id);
+        return Ok(course);
     }
 
     [HttpPost]
     [ProducesResponseType(typeof(CourseResponseDTO), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<Course>> PostCourse(CourseRequestDTO courseDTO)
+    public async Task<ActionResult<CourseResponseDTO>> PostCourse(CourseRequestDTO courseDTO)
     {
-
-        var instructor = await _context.Instructors.FindAsync(courseDTO.InstructorId);
-
-        if (instructor == null)
-            return BadRequest("Instruktor sa datim ID ne postoji");
-
-        var course = courseDTO.ToCourse();
-
-        _context.Courses.Add(course);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction("GetCourse", new { id = course.Id }, course.ToResponseDTO());
-
-
+        var createdCourse = await _courseService.CreateCourseAsync(courseDTO);
+        return CreatedAtAction(nameof(GetCourse), new { id = createdCourse.Id }, createdCourse);
     }
 
     [HttpPut("{id}")]
@@ -103,24 +71,7 @@ public class CourseController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> PutCourse(string id, CourseRequestDTO courseDTO)
     {
-        var courseEntry = await _context.Courses.FindAsync(id);
-
-        if (courseEntry == null)
-        {
-            return NotFound();
-        }
-
-        courseEntry.UpdateFromDTO(courseDTO);
-
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (Exception)
-        {
-            return BadRequest();
-        }
-
+        await _courseService.UpdateCourseAsync(id, courseDTO);
         return NoContent();
     }
 
@@ -129,20 +80,9 @@ public class CourseController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-
     public async Task<IActionResult> DeleteCourseDTO(string id)
     {
-        var courseDTO = await _context.Courses.FindAsync(id);
-        if (courseDTO == null)
-        {
-            return NotFound();
-        }
-
-        _context.Courses.Remove(courseDTO);
-        await _context.SaveChangesAsync();
-
+        await _courseService.DeleteCourseAsync(id);
         return NoContent();
     }
-
-
 }

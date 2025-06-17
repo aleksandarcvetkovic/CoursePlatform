@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CoursePlatform.Models;
 using Namotion.Reflection;
+using CoursePlatform.Services;
 
 namespace CoursePlatform.Controllers
 {
@@ -14,11 +15,11 @@ namespace CoursePlatform.Controllers
     [ApiController]
     public class StudentController : ControllerBase
     {
-        private readonly CoursePlatformContext _context;
+        private readonly IStudentService _studentService;
 
-        public StudentController(CoursePlatformContext context)
+        public StudentController(IStudentService studentService)
         {
-            _context = context;
+            _studentService = studentService;
         }
 
         [HttpGet]
@@ -26,7 +27,7 @@ namespace CoursePlatform.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]        
         public async Task<ActionResult<IEnumerable<StudentResponseDTO>>> GetStudentDTO()
         {
-            var studentsDTO = await _context.Students.Select(s => s.ToStudentResponseDTO()).ToListAsync();
+            var studentsDTO = await _studentService.GetAllStudentsAsync();
             return Ok(studentsDTO);
         }
 
@@ -37,17 +38,9 @@ namespace CoursePlatform.Controllers
         public async Task<ActionResult<StudentResponseDTO>> GetStudentDTO(string id)
         {
 
-            var student = _context.Students.Select(s => s.ToStudentResponseDTO()).FirstOrDefault(s => s.Id == id);
-
-            if (student == null)
-            {
-                return NotFound();
-            }
-
+            var student = await _studentService.GetStudentByIdAsync(id);
             return student;
-
         }
-
 
         [HttpGet("StudentWithEnrollments/{id}")]
         [ProducesResponseType(typeof(StudentWithEnrolmentsDTO), StatusCodes.Status200OK)]
@@ -56,15 +49,8 @@ namespace CoursePlatform.Controllers
         public async Task<ActionResult<StudentWithEnrolmentsDTO>> GetStudentWithEnrollmentsDTO(string id)
         {
 
-            var student = await _context.Students.Include(s => s.Enrollments).Select(s => s.ToStudentWithEnrolmentsDTO()).FirstOrDefaultAsync(s => s.Id == id);
-
-            if (student == null)
-            {
-                return NotFound();
-            }
-
+            var student = await _studentService.GetStudentWithEnrollmentsAsync(id);
             return student;
-
         }
 
         [HttpPut("{id}")]
@@ -75,25 +61,7 @@ namespace CoursePlatform.Controllers
         public async Task<IActionResult> PutStudentDTO(string id, StudentRequestDTO studentDTO)
         {
 
-
-            var studentEntry = await _context.Students.FindAsync(id);
-
-            if (studentEntry == null)
-            {
-                return NotFound();
-            }
-
-            studentEntry.UpdateFromDTO(studentDTO);
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                return BadRequest();
-            }
-
+            await _studentService.UpdateStudentAsync(id, studentDTO);
             return NoContent();
         }
 
@@ -103,14 +71,8 @@ namespace CoursePlatform.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<StudentResponseDTO>> PostStudentDTO(StudentResponseDTO studentDTO)
         {
-
-            var student = studentDTO.ToStudent();
-            _context.Students.Add(studentDTO.ToStudent());
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetStudentDTO", new { id = student.Id }, student.ToStudentResponseDTO());
-
-
+            var created = await _studentService.CreateStudentAsync(studentDTO);
+            return CreatedAtAction("GetStudentDTO", new { id = created.Id }, created);
         }
 
         [HttpDelete("{id}")]
@@ -120,23 +82,8 @@ namespace CoursePlatform.Controllers
         public async Task<IActionResult> DeleteStudentDTO(string id)
         {
 
-            var student = await _context.Students.FindAsync(id);
-            if (student == null)
-            {
-                return NotFound();
-            }
-
-            _context.Students.Remove(student);
-            await _context.SaveChangesAsync();
-
+            await _studentService.DeleteStudentAsync(id);
             return NoContent();
-
-        }
-
-        private bool StudentDTOExists(string id)
-        {
-            return _context.Students.Any(e => e.Id == id);
-            
         }
     }
 }
