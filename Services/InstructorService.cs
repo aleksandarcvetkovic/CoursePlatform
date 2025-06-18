@@ -53,6 +53,7 @@ public class InstructorService : IInstructorService
 
         try
         {
+            await _repository.UpdateAsync(instructor);
             await _repository.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException)

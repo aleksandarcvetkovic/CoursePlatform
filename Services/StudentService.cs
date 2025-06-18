@@ -51,7 +51,6 @@ public class StudentService : IStudentService
         try
         {
             await _studentRepository.UpdateAsync(student);
-            await _studentRepository.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException)
         {
@@ -63,7 +62,6 @@ public class StudentService : IStudentService
     {
         var student = studentDTO.ToStudent();
         await _studentRepository.AddAsync(student);
-        await _studentRepository.SaveChangesAsync();
         return student.ToStudentResponseDTO();
     }
 
@@ -74,6 +72,5 @@ public class StudentService : IStudentService
             throw new NotFoundException($"Student with ID '{id}' was not found.");
 
         await _studentRepository.DeleteAsync(student);
-        await _studentRepository.SaveChangesAsync();
     }
 }

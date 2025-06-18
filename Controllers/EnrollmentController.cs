@@ -38,7 +38,7 @@ namespace CoursePlatform.Controllers
             return Ok(enrollment);
         }
 
-        [HttpGet("EnrollmnetStudentCourse/{id}")]
+        [HttpGet("EnrollmentStudentCourse/{id}")]
         [ProducesResponseType(typeof(EnrollmentWithStudentCourseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<EnrollmentWithStudentCourseDTO>> GetEnrollmentWithStudentCourseDTO(string id)

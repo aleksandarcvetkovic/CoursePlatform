@@ -61,20 +61,20 @@ public class StudentRepository : IStudentRepository
     public async Task AddAsync(Student student)
     {
         await _context.Students.AddAsync(student);
+        await _context.SaveChangesAsync();
     }
 
     public async Task UpdateAsync(Student student)
     {
         _context.Students.Update(student);
+        await _context.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(Student student)
     {
         _context.Students.Remove(student);
-    }
-
-    public async Task SaveChangesAsync()
-    {
         await _context.SaveChangesAsync();
     }
 }
+    
+

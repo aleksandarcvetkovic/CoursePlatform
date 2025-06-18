@@ -17,5 +17,5 @@ public interface IStudentRepository
     Task AddAsync(Student student);
     Task UpdateAsync(Student student);
     Task DeleteAsync(Student student);
-    Task SaveChangesAsync();
 }
+
