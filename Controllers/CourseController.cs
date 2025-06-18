@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using CoursePlatform.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
+using CoursePlatform.Services;
 namespace CoursePlatform.Controllers;
 
 [Route("api/[controller]")]
@@ -10,19 +10,10 @@ namespace CoursePlatform.Controllers;
 public class CourseController : ControllerBase
 {
     private readonly ICourseService _courseService;
-
     public CourseController(ICourseService courseService)
     {
         _courseService = courseService;
-    }
 
-    [HttpGet("check-db")]
-    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public IActionResult CheckDatabase()
-    {
-        var canConnect = _courseService.CanConnectToDatabase();
-        return Ok(new { connected = canConnect });
     }
 
     [HttpGet]

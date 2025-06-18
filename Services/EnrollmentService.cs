@@ -1,97 +1,98 @@
 using CoursePlatform.Models;
+using CoursePlatform.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace CoursePlatform.Services
+namespace CoursePlatform.Services;
+
+public class EnrollmentService : IEnrollmentService
 {
-    public class EnrollmentService : IEnrollmentService
+    private readonly IEnrollmentRepository _repository;
+    private readonly IStudentRepository _studentRepository;
+    private readonly ICourseRepository _courseRepository;
+
+    public EnrollmentService(
+        IEnrollmentRepository repository,
+        IStudentRepository studentRepository,
+        ICourseRepository courseRepository)
     {
-        private readonly CoursePlatformContext _context;
+        _repository = repository;
+        _studentRepository = studentRepository;
+        _courseRepository = courseRepository;
+    }
 
-        public EnrollmentService(CoursePlatformContext context)
+    public async Task<IEnumerable<EnrollmentResponseDTO>> GetAllAsync()
+    {
+        var enrollments = await _repository.GetAllAsync();
+        var result = new List<EnrollmentResponseDTO>();
+        foreach (var e in enrollments)
         {
-            _context = context;
+            result.Add(e.ToEnrolmentResponseDTO());
         }
+        return result;
+    }
 
-        public async Task<IEnumerable<EnrollmentResponseDTO>> GetAllAsync()
+    public async Task<EnrollmentResponseDTO> GetByIdAsync(string id)
+    {
+        var enrollment = await _repository.GetByIdAsync(id);
+        if (enrollment == null)
+            throw new NotFoundException($"Enrollment with id {id} not found.");
+
+        return enrollment.ToEnrolmentResponseDTO();
+    }
+
+    public async Task<EnrollmentWithStudentCourseDTO> GetWithStudentCourseAsync(string id)
+    {
+        var enrollment = await _repository.GetWithStudentCourseAsync(id);
+        if (enrollment == null)
+            throw new NotFoundException($"Enrollment with id {id} not found.");
+
+        return enrollment.ToEnrollmentWithStudentCourseDTO();
+    }
+
+    public async Task UpdateGradeAsync(string id, int grade)
+    {
+        var enrollment = await _repository.GetByIdAsync(id);
+        if (enrollment == null)
+            throw new NotFoundException($"Enrollment with id {id} not found.");
+
+        enrollment.UpdateFromDTO(new EnrollmentGradeRequestDTO
         {
-            return await _context.Enrollments
-                .Select(e => e.ToEnrolmentResponseDTO())
-                .ToListAsync();
-        }
+            Id = id,
+            Grade = grade
+        });
 
-        public async Task<EnrollmentResponseDTO> GetByIdAsync(string id)
-        {
-            var enrollment = await _context.Enrollments
-                .Select(e => e.ToEnrolmentResponseDTO())
-                .FirstOrDefaultAsync(e => e.Id == id);
+        await _repository.UpdateAsync(enrollment);
+    }
 
-            if (enrollment == null)
-                throw new NotFoundException($"Enrollment with id {id} not found.");
-
-            return enrollment;
-        }
-
-        public async Task<EnrollmentWithStudentCourseDTO> GetWithStudentCourseAsync(string id)
-        {
-            var enrollment = await _context.Enrollments
-                .Include(e => e.Course)
-                .Include(e => e.Student)
-                .Select(e => e.ToEnrollmentWithStudentCourseDTO())
-                .FirstOrDefaultAsync(e => e.Id == id);
-
-            if (enrollment == null)
-                throw new NotFoundException($"Enrollment with id {id} not found.");
-
-            return enrollment;
-        }
-
-        public async Task UpdateGradeAsync(string id, int grade)
-        {
-            var enrollment = await _context.Enrollments.FindAsync(id);
-            if (enrollment == null)
-                throw new NotFoundException($"Enrollment with id {id} not found.");
-
-            enrollment.UpdateFromDTO(new EnrollmentGradeRequestDTO
-            {
-                Id = id,
-                Grade = grade
-            });
-
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task<EnrollmentResponseDTO> CreateAsync(EnrollmentRequestDTO dto)
-        {
-            // Check if Student exists
-            var studentExists = await _context.Students.AnyAsync(s => s.Id == dto.StudentId);
-            if (!studentExists)
+    public async Task<EnrollmentResponseDTO> CreateAsync(EnrollmentRequestDTO dto)
+    {
+        // Check if Student exists using StudentRepository
+        var student = await _studentRepository.GetByIdAsync(dto.StudentId);
+        if (student == null)
             throw new NotFoundException($"Student with id {dto.StudentId} not found.");
 
-            // Check if Course exists
-            var courseExists = await _context.Courses.AnyAsync(c => c.Id == dto.CourseId);
-            if (!courseExists)
+        // Check if Course exists using CourseRepository
+        var course = await _courseRepository.GetByIdAsync(dto.CourseId);
+        if (course == null)
             throw new NotFoundException($"Course with id {dto.CourseId} not found.");
 
-            var newEnrollment = dto.ToEnrolment();
-            newEnrollment.EnrolledOn = DateTime.Now;
+        var newEnrollment = dto.ToEnrolment();
+        newEnrollment.EnrolledOn = DateTime.Now;
 
-            _context.Enrollments.Add(newEnrollment);
-            await _context.SaveChangesAsync();
+        await _repository.AddAsync(newEnrollment);
 
-            return newEnrollment.ToEnrolmentResponseDTO();
-        }
+        return newEnrollment.ToEnrolmentResponseDTO();
+    }
 
-        public async Task DeleteAsync(string id)
-        {
-            var enrollment = await _context.Enrollments.FindAsync(id);
-            if (enrollment == null)
-                throw new NotFoundException($"Enrollment with id {id} not found.");
+    public async Task DeleteAsync(string id)
+    {
+        var enrollment = await _repository.GetByIdAsync(id);
+        if (enrollment == null)
+            throw new NotFoundException($"Enrollment with id {id} not found.");
 
-            _context.Enrollments.Remove(enrollment);
-            await _context.SaveChangesAsync();
-        }
+        await _repository.DeleteAsync(enrollment);
     }
 }

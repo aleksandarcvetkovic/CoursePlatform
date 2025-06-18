@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CoursePlatform.Models;
+using CoursePlatform.Services;
 
 namespace CoursePlatform.Controllers
 {

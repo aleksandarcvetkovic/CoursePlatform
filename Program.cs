@@ -1,6 +1,7 @@
 using CoursePlatform.Models;
 using Microsoft.EntityFrameworkCore;
 using CoursePlatform.Services;
+using CoursePlatform.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,10 @@ builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IInstructorService, InstructorService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
+builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+builder.Services.AddScoped<IInstructorRepository, InstructorRepository>();
+builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
 
 var app = builder.Build();
 

@@ -2,59 +2,50 @@ using CoursePlatform.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CoursePlatform.Repositories;
+namespace CoursePlatform.Services;
 
 public class InstructorService : IInstructorService
 {
-    private readonly CoursePlatformContext _context;
+    private readonly IInstructorRepository _repository;
 
-    public InstructorService(CoursePlatformContext context)
+    public InstructorService(IInstructorRepository repository)
     {
-        _context = context;
+        _repository = repository;
     }
 
     public async Task<IEnumerable<InstructorResponseDTO>> GetAllInstructorsAsync()
     {
-        return await _context.Instructors
-            .Select(i => i.ToInstructorResponseDTO())
-            .ToListAsync();
+        return await _repository.GetAllDTOsAsync();
     }
 
     public async Task<InstructorResponseDTO> GetInstructorByIdAsync(string id)
     {
-        var instructor = await _context.Instructors
-            .Select(i => i.ToInstructorResponseDTO())
-            .FirstOrDefaultAsync(i => i.Id == id);
-
-        if (instructor == null)
+        var instructorDTO = await _repository.GetDTOByIdAsync(id);
+        if (instructorDTO == null)
             throw new NotFoundException("Instructor not found");
-
-        return instructor;
+        return instructorDTO;
     }
 
     public async Task<InstructorWithCoursesDTO> GetInstructorWithCoursesAsync(string id)
     {
-        var instructor = await _context.Instructors
-            .Include(i => i.Courses)
-            .Select(i => i.ToInstructorWithCoursesDTO())
-            .FirstOrDefaultAsync(i => i.Id == id);
-
-        if (instructor == null)
+        var instructorDTO = await _repository.GetWithCoursesDTOAsync(id);
+        if (instructorDTO == null)
             throw new NotFoundException("Instructor not found");
-
-        return instructor;
+        return instructorDTO;
     }
 
     public async Task<InstructorResponseDTO> CreateInstructorAsync(InstructorRequestDTO instructorDTO)
     {
         var instructor = instructorDTO.ToInstructor();
-        _context.Instructors.Add(instructor);
-        await _context.SaveChangesAsync();
+        await _repository.AddAsync(instructor);
+        await _repository.SaveChangesAsync();
         return instructor.ToInstructorResponseDTO();
     }
 
     public async Task UpdateInstructorAsync(string id, InstructorRequestDTO instructorDTO)
     {
-        var instructor = await _context.Instructors.FindAsync(id);
+        var instructor = await _repository.GetByIdAsync(id);
         if (instructor == null)
             throw new NotFoundException("Instructor not found");
 
@@ -62,7 +53,7 @@ public class InstructorService : IInstructorService
 
         try
         {
-            await _context.SaveChangesAsync();
+            await _repository.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException)
         {
@@ -72,11 +63,11 @@ public class InstructorService : IInstructorService
 
     public async Task DeleteInstructorAsync(string id)
     {
-        var instructor = await _context.Instructors.FindAsync(id);
+        var instructor = await _repository.GetByIdAsync(id);
         if (instructor == null)
             throw new NotFoundException("Instructor not found");
 
-        _context.Instructors.Remove(instructor);
-        await _context.SaveChangesAsync();
+        await _repository.DeleteAsync(instructor);
+        await _repository.SaveChangesAsync();
     }
 }
