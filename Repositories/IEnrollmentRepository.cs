@@ -4,11 +4,10 @@ using System.Threading.Tasks;
 
 namespace CoursePlatform.Repositories;
 
-public interface IEnrollmentRepository
+public interface IEnrollmentRepository : IGenericRepository<Enrollment>
 {
-    Task<IEnumerable<Enrollment>> GetAllAsync();
-    Task<Enrollment?> GetByIdAsync(string id);
-    Task<Enrollment?> GetWithStudentCourseAsync(string id);
+    Task<IEnumerable<EnrollmentResponseDTO>> GetAllDTOsAsync();
+    Task<EnrollmentWithStudentCourseDTO?> GetWithStudentCourseAsync(string id);
     Task AddAsync(Enrollment enrollment);
     Task UpdateAsync(Enrollment enrollment);
     Task DeleteAsync(Enrollment enrollment);

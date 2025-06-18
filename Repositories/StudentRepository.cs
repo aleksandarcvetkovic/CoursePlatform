@@ -3,26 +3,18 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using CoursePlatform.Models;
 using System.Linq;
+using CoursePlatform.Mappers;
+
 
 namespace CoursePlatform.Repositories;
 
-public class StudentRepository : IStudentRepository
+public class StudentRepository : GenericRepository<Student>, IStudentRepository
 {
     private readonly CoursePlatformContext _context;
 
-    public StudentRepository(CoursePlatformContext context)
+    public StudentRepository(CoursePlatformContext context) : base(context)
     {
         _context = context;
-    }
-
-    public async Task<IEnumerable<Student>> GetAllAsync()
-    {
-        return await _context.Students.ToListAsync();
-    }
-
-    public async Task<Student?> GetByIdAsync(string id)
-    {
-        return await _context.Students.FindAsync(id);
     }
 
     public async Task<Student?> GetWithEnrollmentsAsync(string id)
@@ -58,23 +50,6 @@ public class StudentRepository : IStudentRepository
         return student;
     }
 
-    public async Task AddAsync(Student student)
-    {
-        await _context.Students.AddAsync(student);
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task UpdateAsync(Student student)
-    {
-        _context.Students.Update(student);
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task DeleteAsync(Student student)
-    {
-        _context.Students.Remove(student);
-        await _context.SaveChangesAsync();
-    }
 }
-    
+
 

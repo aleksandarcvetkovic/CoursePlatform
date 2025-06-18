@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using CoursePlatform.Repositories;
 namespace CoursePlatform.Services;
+using CoursePlatform.Mappers;
 
 public class InstructorService : IInstructorService
 {
@@ -39,7 +40,6 @@ public class InstructorService : IInstructorService
     {
         var instructor = instructorDTO.ToInstructor();
         await _repository.AddAsync(instructor);
-        await _repository.SaveChangesAsync();
         return instructor.ToInstructorResponseDTO();
     }
 
@@ -54,7 +54,6 @@ public class InstructorService : IInstructorService
         try
         {
             await _repository.UpdateAsync(instructor);
-            await _repository.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException)
         {
@@ -69,6 +68,5 @@ public class InstructorService : IInstructorService
             throw new NotFoundException("Instructor not found");
 
         await _repository.DeleteAsync(instructor);
-        await _repository.SaveChangesAsync();
     }
 }

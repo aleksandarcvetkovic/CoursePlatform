@@ -1,6 +1,7 @@
 using CoursePlatform.Models;
 using CoursePlatform.Repositories;
 using Microsoft.EntityFrameworkCore;
+using CoursePlatform.Mappers;
 
 namespace CoursePlatform.Services;
 
@@ -17,7 +18,7 @@ public class CourseService : ICourseService
 
     public async Task<IEnumerable<CourseResponseDTO>> GetAllCoursesAsync()
     {
-        return await _courseRepository.GetAllAsync();
+        return await _courseRepository.GetAllDTOAsync();
     }
 
     public async Task<CourseResponseDTO> GetCourseAsync(string id)

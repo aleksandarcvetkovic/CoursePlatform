@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CoursePlatform.Mappers;
 
 namespace CoursePlatform.Services;
 
@@ -25,13 +26,7 @@ public class EnrollmentService : IEnrollmentService
 
     public async Task<IEnumerable<EnrollmentResponseDTO>> GetAllAsync()
     {
-        var enrollments = await _repository.GetAllAsync();
-        var result = new List<EnrollmentResponseDTO>();
-        foreach (var e in enrollments)
-        {
-            result.Add(e.ToEnrolmentResponseDTO());
-        }
-        return result;
+        return await _repository.GetAllDTOsAsync();
     }
 
     public async Task<EnrollmentResponseDTO> GetByIdAsync(string id)
@@ -40,7 +35,7 @@ public class EnrollmentService : IEnrollmentService
         if (enrollment == null)
             throw new NotFoundException($"Enrollment with id {id} not found.");
 
-        return enrollment.ToEnrolmentResponseDTO();
+        return enrollment.ToEnrollmentResponseDTO();
     }
 
     public async Task<EnrollmentWithStudentCourseDTO> GetWithStudentCourseAsync(string id)
@@ -49,7 +44,7 @@ public class EnrollmentService : IEnrollmentService
         if (enrollment == null)
             throw new NotFoundException($"Enrollment with id {id} not found.");
 
-        return enrollment.ToEnrollmentWithStudentCourseDTO();
+        return enrollment;
     }
 
     public async Task UpdateGradeAsync(string id, int grade)
@@ -79,12 +74,12 @@ public class EnrollmentService : IEnrollmentService
         if (course == null)
             throw new NotFoundException($"Course with id {dto.CourseId} not found.");
 
-        var newEnrollment = dto.ToEnrolment();
+        var newEnrollment = dto.ToEnrollment();
         newEnrollment.EnrolledOn = DateTime.Now;
 
         await _repository.AddAsync(newEnrollment);
 
-        return newEnrollment.ToEnrolmentResponseDTO();
+        return newEnrollment.ToEnrollmentResponseDTO();
     }
 
     public async Task DeleteAsync(string id)

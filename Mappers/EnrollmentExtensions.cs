@@ -2,9 +2,10 @@ using System.Reflection.Metadata.Ecma335;
 using CoursePlatform.Models;
 using Microsoft.AspNetCore.Components.Web;
 
-public static class EnrolmentExtensions
+namespace CoursePlatform.Mappers;
+public static class EnrollmentExtensions
 {
-    public static EnrollmentResponseDTO ToEnrolmentResponseDTO(this Enrollment enrollment)
+    public static EnrollmentResponseDTO ToEnrollmentResponseDTO(this Enrollment enrollment)
     {
         return new EnrollmentResponseDTO
         {
@@ -18,7 +19,7 @@ public static class EnrolmentExtensions
 
 
     }
-    public static EnrollmentWithStudentCourseDTO ToEnrollmentWithStudentCourseDTO(this Enrollment enrollment)
+    public static EnrollmentWithStudentCourseDTO ToEnrollmentWithStudentCourse(this Enrollment enrollment)
     {
         return new EnrollmentWithStudentCourseDTO
         {
@@ -27,13 +28,13 @@ public static class EnrolmentExtensions
             EnrolmentStudent = enrollment.Student.ToStudentResponseDTO(),
             EnrolledOn = enrollment.EnrolledOn,
             Grade = enrollment.Grade,
-            
+
 
         };
 
 
     }
-    public static Enrollment ToEnrolment(this EnrollmentResponseDTO enrollmentDTO)
+    public static Enrollment ToEnrollment(this EnrollmentResponseDTO enrollmentDTO)
     {
         return new Enrollment
         {
@@ -45,7 +46,7 @@ public static class EnrolmentExtensions
 
         };
     }
-    public static Enrollment ToEnrolment(this EnrollmentRequestDTO enrollmentDTO)
+    public static Enrollment ToEnrollment(this EnrollmentRequestDTO enrollmentDTO)
     {
         return new Enrollment
         {
@@ -73,10 +74,10 @@ public static class EnrolmentExtensions
         enrollment.Grade = enrollmentDTO.Grade;
     }
 
-    
+
 
     public static IEnumerable<EnrollmentResponseDTO> ToDTOs(this IEnumerable<Enrollment> enrollments)
     {
-        return enrollments.Select(e => e.ToEnrolmentResponseDTO());
+        return enrollments.Select(e => e.ToEnrollmentResponseDTO());
     }
 }

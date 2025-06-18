@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using CoursePlatform.Models;
 using CoursePlatform.Repositories;
+using CoursePlatform.Mappers;
 
 namespace CoursePlatform.Services;
 

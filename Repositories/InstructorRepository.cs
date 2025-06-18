@@ -3,26 +3,17 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using CoursePlatform.Mappers;
 
 namespace CoursePlatform.Repositories;
 
-public class InstructorRepository : IInstructorRepository
+public class InstructorRepository : GenericRepository<Instructor>, IInstructorRepository
 {
     private readonly CoursePlatformContext _context;
 
-    public InstructorRepository(CoursePlatformContext context)
+    public InstructorRepository(CoursePlatformContext context) : base(context)
     {
         _context = context;
-    }
-
-    public async Task<IEnumerable<Instructor>> GetAllAsync()
-    {
-        return await _context.Instructors.ToListAsync();
-    }
-
-    public async Task<Instructor?> GetByIdAsync(string id)
-    {
-        return await _context.Instructors.FindAsync(id);
     }
 
     public async Task<Instructor?> GetWithCoursesAsync(string id)
@@ -53,23 +44,4 @@ public class InstructorRepository : IInstructorRepository
         return instructor?.ToInstructorWithCoursesDTO();
     }
 
-    public async Task AddAsync(Instructor instructor)
-    {
-        await _context.Instructors.AddAsync(instructor);
-    }
-
-    public async Task UpdateAsync(Instructor instructor)
-    {
-        _context.Instructors.Update(instructor);
-    }
-
-    public async Task DeleteAsync(Instructor instructor)
-    {
-        _context.Instructors.Remove(instructor);
-    }
-
-    public async Task SaveChangesAsync()
-    {
-        await _context.SaveChangesAsync();
-    }
 }
