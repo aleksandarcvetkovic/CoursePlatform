@@ -69,9 +69,9 @@ namespace CoursePlatform.Controllers
         [ProducesResponseType(typeof(StudentResponseDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<StudentResponseDTO>> PostStudentDTO(StudentResponseDTO studentDTO)
+        public async Task<ActionResult<StudentResponseDTO>> PostStudentDTO(StudentRequestDTO studentRequestDTO)
         {
-            var created = await _studentService.CreateStudentAsync(studentDTO);
+            var created = await _studentService.CreateStudentAsync(studentRequestDTO);
             return CreatedAtAction("GetStudentDTO", new { id = created.Id }, created);
         }
 

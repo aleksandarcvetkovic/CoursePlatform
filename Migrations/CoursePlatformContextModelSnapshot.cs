@@ -25,6 +25,7 @@ namespace CoursePlatform.Migrations
             modelBuilder.Entity("CoursePlatform.Models.Course", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
@@ -49,6 +50,7 @@ namespace CoursePlatform.Migrations
             modelBuilder.Entity("CoursePlatform.Models.Enrollment", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("CourseId")
@@ -77,6 +79,7 @@ namespace CoursePlatform.Migrations
             modelBuilder.Entity("CoursePlatform.Models.Instructor", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Email")
@@ -95,6 +98,7 @@ namespace CoursePlatform.Migrations
             modelBuilder.Entity("CoursePlatform.Models.Student", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Email")

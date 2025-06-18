@@ -63,7 +63,7 @@ namespace CoursePlatform.Services
             }
         }
 
-        public async Task<StudentResponseDTO> CreateStudentAsync(StudentResponseDTO studentDTO)
+        public async Task<StudentResponseDTO> CreateStudentAsync(StudentRequestDTO studentDTO)
         {
             var student = studentDTO.ToStudent();
             _context.Students.Add(student);

@@ -1,11 +1,12 @@
 using System.ComponentModel.DataAnnotations;
-
+using System.ComponentModel.DataAnnotations.Schema;
 namespace CoursePlatform.Models;
 
 public class Student
 {
     [Key]
-    public string Id { get; set; } = Guid.NewGuid().ToString();
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public string Id { get; set; } 
     public string Name { get; set; }
     public string Email { get; set; }
 

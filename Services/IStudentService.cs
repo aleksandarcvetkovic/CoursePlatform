@@ -10,7 +10,7 @@ namespace CoursePlatform.Services
         Task<StudentResponseDTO> GetStudentByIdAsync(string id);
         Task<StudentWithEnrolmentsDTO> GetStudentWithEnrollmentsAsync(string id);
         Task UpdateStudentAsync(string id, StudentRequestDTO studentDTO);
-        Task<StudentResponseDTO> CreateStudentAsync(StudentResponseDTO studentDTO);
+        Task<StudentResponseDTO> CreateStudentAsync(StudentRequestDTO studentDTO);
         Task DeleteStudentAsync(string id);
     }    
 }

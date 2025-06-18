@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CoursePlatform.Migrations
 {
     [DbContext(typeof(CoursePlatformContext))]
-    [Migration("20250613094531_nova")]
+    [Migration("20250618072838_nova")]
     partial class nova
     {
         /// <inheritdoc />
@@ -28,6 +28,7 @@ namespace CoursePlatform.Migrations
             modelBuilder.Entity("CoursePlatform.Models.Course", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
@@ -52,6 +53,7 @@ namespace CoursePlatform.Migrations
             modelBuilder.Entity("CoursePlatform.Models.Enrollment", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("CourseId")
@@ -80,6 +82,7 @@ namespace CoursePlatform.Migrations
             modelBuilder.Entity("CoursePlatform.Models.Instructor", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Email")
@@ -98,6 +101,7 @@ namespace CoursePlatform.Migrations
             modelBuilder.Entity("CoursePlatform.Models.Student", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Email")
