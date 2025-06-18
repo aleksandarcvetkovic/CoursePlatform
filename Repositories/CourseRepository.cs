@@ -1,20 +1,20 @@
 using CoursePlatform.Models;
 using Microsoft.EntityFrameworkCore;
 using CoursePlatform.Mappers;
+using Microsoft.EntityFrameworkCore.Storage;
 namespace CoursePlatform.Repositories;
 
 public class CourseRepository : GenericRepository<Course>, ICourseRepository
 {
-    private readonly CoursePlatformContext _context;
 
     public CourseRepository(CoursePlatformContext context) : base(context)
     {
-        _context = context;
+
     }
 
     public async Task<IEnumerable<CourseResponseDTO>> GetAllDTOAsync()
     {
-        return await _context.Courses
+        return await _dbSet
             .Include(c => c.Instructor)
             .Select(c => c.ToResponseDTO())
             .ToListAsync();
@@ -22,7 +22,7 @@ public class CourseRepository : GenericRepository<Course>, ICourseRepository
 
     public async Task<CourseWithInstructorDTO?> GetWithInstructorAsync(string id)
     {
-        return await _context.Courses
+        return await _dbSet
             .Include(c => c.Instructor)
             .Where(c => c.Id == id)
             .Select(c => c.ToCourseWithInstructor())
@@ -31,7 +31,7 @@ public class CourseRepository : GenericRepository<Course>, ICourseRepository
 
     public async Task<IEnumerable<CourseWithInstructorDTO>> GetAllWithInstructorAsync()
     {
-        return await _context.Courses
+        return await _dbSet
             .Include(c => c.Instructor)
             .Select(c => c.ToCourseWithInstructor())
             .ToListAsync();
@@ -39,6 +39,6 @@ public class CourseRepository : GenericRepository<Course>, ICourseRepository
 
     public async Task<bool> ExistsAsync(string id)
     {
-        return await _context.Courses.AnyAsync(c => c.Id == id);
+        return await _dbSet.AnyAsync(c => c.Id == id);
     }
 }

@@ -1,3 +1,4 @@
+using CoursePlatform.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -6,15 +7,15 @@ namespace CoursePlatform.Repositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        protected readonly DbContext _context;
+        private readonly CoursePlatformContext _context;
         protected readonly DbSet<T> _dbSet;
 
-        public GenericRepository(DbContext context)
+        public GenericRepository(CoursePlatformContext context)
         {
             _context = context;
             _dbSet = _context.Set<T>();
         }
-        
+
         public virtual async Task<T?> GetByIdAsync(string id)
         {
             return await _dbSet.FindAsync(id);

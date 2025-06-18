@@ -10,30 +10,27 @@ namespace CoursePlatform.Repositories;
 
 public class StudentRepository : GenericRepository<Student>, IStudentRepository
 {
-    private readonly CoursePlatformContext _context;
-
     public StudentRepository(CoursePlatformContext context) : base(context)
     {
-        _context = context;
     }
 
     public async Task<Student?> GetWithEnrollmentsAsync(string id)
     {
-        return await _context.Students
+        return await _dbSet
             .Include(s => s.Enrollments)
             .FirstOrDefaultAsync(s => s.Id == id);
     }
 
     public async Task<IEnumerable<StudentResponseDTO>> GetAllStudentDTOsAsync()
     {
-        return await _context.Students
+        return await _dbSet
             .Select(s => s.ToStudentResponseDTO())
             .ToListAsync();
     }
 
     public async Task<StudentResponseDTO?> GetStudentDTOByIdAsync(string id)
     {
-        var student = await _context.Students
+        var student = await _dbSet
             .Where(s => s.Id == id)
             .Select(s => s.ToStudentResponseDTO())
             .FirstOrDefaultAsync();
@@ -42,7 +39,7 @@ public class StudentRepository : GenericRepository<Student>, IStudentRepository
 
     public async Task<StudentWithEnrolmentsDTO?> GetStudentWithEnrollmentsDTOAsync(string id)
     {
-        var student = await _context.Students
+        var student = await _dbSet
             .Include(s => s.Enrollments)
             .Where(s => s.Id == id)
             .Select(s => s.ToStudentWithEnrolmentsDTO())
