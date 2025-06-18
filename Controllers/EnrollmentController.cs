@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CoursePlatform.Models;
-using System.Diagnostics.CodeAnalysis;
+using CoursePlatform.Services;
 
 namespace CoursePlatform.Controllers
 {
@@ -14,134 +14,65 @@ namespace CoursePlatform.Controllers
     [ApiController]
     public class EnrollmentController : ControllerBase
     {
-        private readonly CoursePlatformContext _context;
+        private readonly IEnrollmentService _service;
 
-        public EnrollmentController(CoursePlatformContext context)
+        public EnrollmentController(IEnrollmentService service)
         {
-            _context = context;
+            _service = service;
         }
 
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<EnrollmentResponseDTO>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<EnrollmentResponseDTO>>> GetEnrollmentDTO()
         {
-            var enrollments = await _context.Enrollments.Select(e => e.ToEnrolmentResponseDTO()).ToListAsync();
+            var enrollments = await _service.GetAllAsync();
             return Ok(enrollments);
         }
 
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(EnrollmentResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<EnrollmentResponseDTO>> GetEnrollment(string id)
         {
-
-            var enrollment = _context.Enrollments.Select(e => e.ToEnrolmentResponseDTO()).FirstOrDefault(e => e.Id == id);
-
-            if (enrollment == null)
-            {
-                return NotFound();
-            }
-
-            return enrollment;
-
+            var enrollment = await _service.GetByIdAsync(id);
+            return Ok(enrollment);
         }
 
         [HttpGet("EnrollmnetStudentCourse/{id}")]
         [ProducesResponseType(typeof(EnrollmentWithStudentCourseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<EnrollmentWithStudentCourseDTO>> GetEnrollmentWithStudentCourseDTO(string id)
         {
-
-            var enrollment = _context.Enrollments.Include(e => e.Course).Include(e => e.Student).Select(e => e.ToEnrollmentWithStudentCourseDTO()).FirstOrDefault(e => e.Id == id);
-
-            if (enrollment == null)
-            {
-                return NotFound();
-            }
-
-            return enrollment;
-
+            var enrollment = await _service.GetWithStudentCourseAsync(id);
+            return Ok(enrollment);
         }
 
         [HttpPut("{id}/{grade}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> PutEnrollment(string id, int grade)
         {
-            var enrollment = await _context.Enrollments.FindAsync(id);
-
-            if (enrollment == null)
-            {
-                return NotFound();
-            }
-
-
-            enrollment.UpdateFromDTO(new EnrollmentGradeRequestDTO
-            {
-                Id = id,
-                Grade = grade
-            });
-
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                return BadRequest();
-            }
-
+            await _service.UpdateGradeAsync(id, grade);
             return NoContent();
         }
 
         [HttpPost]
         [ProducesResponseType(typeof(EnrollmentResponseDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Enrollment>> PostEnrollment(EnrollmentRequestDTO enrollmentRequestDTO)
+        public async Task<ActionResult<EnrollmentResponseDTO>> PostEnrollment(EnrollmentRequestDTO enrollmentRequestDTO)
         {
-
-            var newEnrollment = enrollmentRequestDTO.ToEnrolment();
-            newEnrollment.EnrolledOn = DateTime.Now;
-
-            _context.Enrollments.Add(newEnrollment);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetEnrollment", new { id = newEnrollment.Id }, newEnrollment.ToEnrolmentResponseDTO());
-
+            var created = await _service.CreateAsync(enrollmentRequestDTO);
+            return CreatedAtAction(nameof(GetEnrollment), new { id = created.Id }, created);
         }
 
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteEnrollmentDTO(string id)
         {
-
-            var enrollment = await _context.Enrollments.FindAsync(id);
-            if (enrollment == null)
-            {
-                return NotFound();
-            }
-
-            _context.Enrollments.Remove(enrollment);
-            await _context.SaveChangesAsync();
-
+            await _service.DeleteAsync(id);
             return NoContent();
-
-
-        }
-
-        private bool EnrollmentDTOExists(string id)
-        {
-            return _context.Enrollments.Any(e => e.Id == id);
-            
         }
     }
 }

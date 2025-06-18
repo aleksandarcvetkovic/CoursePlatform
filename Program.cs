@@ -1,5 +1,6 @@
 using CoursePlatform.Models;
 using Microsoft.EntityFrameworkCore;
+using CoursePlatform.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,11 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<CoursePlatformContext>(options =>
     options.UseSqlServer(builder.Configuration["DefaultConnection"]));
 
+builder.Services.AddScoped<IStudentService, StudentService>();
+builder.Services.AddScoped<IInstructorService, InstructorService>();
+builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -23,6 +29,8 @@ if (app.Environment.IsDevelopment())
         options.DocumentPath = "/openapi/v1.json";
     });
 }
+
+app.UseMiddleware<CoursePlatform.Middleware.GlobalExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 
