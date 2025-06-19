@@ -42,14 +42,11 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-const string StudentRoute = "/api/student";
-const string InstructorRoute = "/api/instructor";
-const string CourseRoute = "/api/course";
-const string EnrollmentRoute = "/api/enrollment";
+app.MapStudentEndpoints();
+app.MapInstructorEndpoints();
+app.MapCourseEndpoints();
+app.MapEnrollmentEndpoints();
 
-app.MapStudentEndpoints(StudentRoute);
-app.MapInstructorEndpoints(InstructorRoute);
-app.MapCourseEndpoints(CourseRoute);
-app.MapEnrollmentEndpoints(EnrollmentRoute);
+app.Run();
 
 app.Run();
