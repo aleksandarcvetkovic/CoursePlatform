@@ -2,6 +2,7 @@ using System.Reflection.Metadata.Ecma335;
 using CoursePlatform.Models;
 using Microsoft.AspNetCore.Components.Web;
 
+namespace CoursePlatform.Mappers;
 public static class InstructorExtensions
 {
     public static InstructorResponseDTO ToInstructorResponseDTO(this Instructor instructor)
@@ -13,8 +14,6 @@ public static class InstructorExtensions
             Email = instructor.Email,
 
         };
-
-
     }
     public static Instructor ToInstructor(this InstructorResponseDTO instructorDTO)
     {
@@ -35,7 +34,7 @@ public static class InstructorExtensions
 
         };
     }
-  
+
     public static InstructorWithCoursesDTO ToInstructorWithCoursesDTO(this Instructor instructor)
     {
 

@@ -2,6 +2,8 @@ using CoursePlatform.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+namespace CoursePlatform.Services;
+
 public interface IInstructorService
 {
     Task<IEnumerable<InstructorResponseDTO>> GetAllInstructorsAsync();

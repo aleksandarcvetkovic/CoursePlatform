@@ -1,6 +1,7 @@
 using System.Reflection.Metadata.Ecma335;
 using CoursePlatform.Models;
 
+namespace CoursePlatform.Mappers;
 public static class CourseExtensions
 {
     public static CourseResponseDTO ToResponseDTO(this Course course)
@@ -31,7 +32,7 @@ public static class CourseExtensions
         course.Id = courseDTO.Id;
         course.Title = courseDTO.Title;
         course.Description = courseDTO.Description;
-        
+
 
     }
 

@@ -2,6 +2,7 @@ using System.Reflection.Metadata.Ecma335;
 using CoursePlatform.Models;
 using Microsoft.AspNetCore.Components.Web;
 
+namespace CoursePlatform.Mappers;
 public static class StudentExtensions
 {
     public static StudentResponseDTO ToStudentResponseDTO(this Student student)
@@ -67,5 +68,5 @@ public static class StudentExtensions
     {
         return students.Select(c => c.ToStudentResponseDTO());
     }
-    
+
 }

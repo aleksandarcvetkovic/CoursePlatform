@@ -1,77 +1,71 @@
 using CoursePlatform.Models;
+using CoursePlatform.Repositories;
 using Microsoft.EntityFrameworkCore;
+using CoursePlatform.Mappers;
+
+namespace CoursePlatform.Services;
 
 public class CourseService : ICourseService
 {
-    private readonly CoursePlatformContext _context;
+    private readonly ICourseRepository _courseRepository;
+    private readonly IInstructorRepository _instructorRepository;
 
-    public CourseService(CoursePlatformContext context)
+    public CourseService(ICourseRepository courseRepository, IInstructorRepository instructorRepository)
     {
-        _context = context;
+        _courseRepository = courseRepository;
+        _instructorRepository = instructorRepository;
     }
-
-    public bool CanConnectToDatabase() => _context.Database.CanConnect();
 
     public async Task<IEnumerable<CourseResponseDTO>> GetAllCoursesAsync()
     {
-        return await _context.Courses.Include(c => c.Instructor)
-            .Select(c => c.ToResponseDTO())
-            .ToListAsync();
+        return await _courseRepository.GetAllDTOAsync();
     }
 
     public async Task<CourseResponseDTO> GetCourseAsync(string id)
     {
-        var course = await _context.Courses
-            .Select(c => c.ToResponseDTO())
-            .FirstOrDefaultAsync(c => c.Id == id);
-
+        var course = await _courseRepository.GetByIdAsync(id);
         if (course == null)
             throw new NotFoundException("Course not found");
 
-        return course;
+        return course.ToResponseDTO();
     }
 
     public async Task<CourseWithInstructorDTO> GetCourseWithInstructorAsync(string id)
     {
-        var course = await _context.Courses.Include(c => c.Instructor)
-            .Select(c => c.ToCourseWithInstructor())
-            .FirstOrDefaultAsync(c => c.Id == id);
-
-        if (course == null)
+        var courseDto = await _courseRepository.GetWithInstructorAsync(id);
+        if (courseDto == null)
             throw new NotFoundException("Course not found");
 
-        return course;
+        return courseDto;
     }
 
     public async Task<CourseResponseDTO> CreateCourseAsync(CourseRequestDTO courseDTO)
     {
-        var instructor = await _context.Instructors.FindAsync(courseDTO.InstructorId);
+        var instructor = await _instructorRepository.GetByIdAsync(courseDTO.InstructorId);
         if (instructor == null)
             throw new BadRequestException("Instructor does not exist");
 
         var course = courseDTO.ToCourse();
-        _context.Courses.Add(course);
-        await _context.SaveChangesAsync();
+        await _courseRepository.AddAsync(course);
         return course.ToResponseDTO();
     }
 
     public async Task UpdateCourseAsync(string id, CourseRequestDTO courseDTO)
     {
-        var course = await _context.Courses.FindAsync(id);
+        var course = await _courseRepository.GetByIdAsync(id);
         if (course == null)
             throw new NotFoundException("Course not found");
 
         course.UpdateFromDTO(courseDTO);
-        await _context.SaveChangesAsync();
+        await _courseRepository.UpdateAsync(course);
     }
 
     public async Task DeleteCourseAsync(string id)
     {
-        var course = await _context.Courses.FindAsync(id);
+        var course = await _courseRepository.GetByIdAsync(id);
         if (course == null)
             throw new NotFoundException("Course not found");
 
-        _context.Courses.Remove(course);
-        await _context.SaveChangesAsync();
+        await _courseRepository.DeleteAsync(course);
     }
 }

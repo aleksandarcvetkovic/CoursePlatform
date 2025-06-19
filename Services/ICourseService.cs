@@ -1,4 +1,5 @@
 using CoursePlatform.Models;
+namespace CoursePlatform.Services;
 
 public interface ICourseService
 {
@@ -8,5 +9,5 @@ public interface ICourseService
     Task<CourseResponseDTO> CreateCourseAsync(CourseRequestDTO courseDTO);
     Task UpdateCourseAsync(string id, CourseRequestDTO courseDTO);
     Task DeleteCourseAsync(string id);
-    bool CanConnectToDatabase();
+   
 }
