@@ -2,6 +2,7 @@ using CoursePlatform.Models;
 using Microsoft.EntityFrameworkCore;
 using CoursePlatform.Services;
 using CoursePlatform.Repositories;
+using CoursePlatform.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +42,11 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.MapControllers();
+app.MapStudentEndpoints();
+app.MapInstructorEndpoints();
+app.MapCourseEndpoints();
+app.MapEnrollmentEndpoints();
+
+app.Run();
 
 app.Run();
