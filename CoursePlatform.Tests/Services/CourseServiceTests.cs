@@ -5,16 +5,17 @@ using CoursePlatform.Repositories;
 using CoursePlatform.Services;
 using System.Threading.Tasks;
 
+
 namespace CoursePlatform.Tests.Services;
 
 public class CourseServiceTests
 {
-    private CoursePlatformDbContext GetDbContext(string dbName)
+    private CoursePlatformContext GetDbContext(string dbName)
     {
-        var options = new DbContextOptionsBuilder<CoursePlatformDbContext>()
+        var options = new DbContextOptionsBuilder<CoursePlatformContext>()
             .UseInMemoryDatabase(databaseName: dbName)
             .Options;
-        return new CoursePlatformDbContext(options);
+        return new CoursePlatformContext(options);
     }
 
     [Fact]
@@ -27,23 +28,23 @@ public class CourseServiceTests
         var courseService = new CourseService(courseRepo, instructorRepo);
 
         // Create instructor first
-        var instructorDto = new InstructorRequestDTO { FirstName = "Vesna", LastName = "Stojanović", Email = "vesna.stojanovic@example.com" };
+        var instructorDto = new InstructorRequestDTO { Name = "Vesna Stojanović", Email = "vesna.stojanovic@example.com" };
         var instructor = await instructorService.CreateInstructorAsync(instructorDto);
 
         // Create course
-        var courseDto = new CourseRequestDTO { Name = "Matematika", Description = "Algebra", InstructorId = instructor.Id };
+        var courseDto = new CourseRequestDTO { Title = "Matematika", Description = "Algebra", InstructorId = instructor.Id };
         var created = await courseService.CreateCourseAsync(courseDto);
         Assert.NotNull(created.Id);
 
         // Read
         var fetched = await courseService.GetCourseAsync(created.Id);
-        Assert.Equal("Matematika", fetched.Name);
+        Assert.Equal("Matematika", fetched.Title);
 
         // Update
-        var updateDto = new CourseRequestDTO { Name = "Fizika", Description = "Mehanika", InstructorId = instructor.Id };
+        var updateDto = new CourseRequestDTO { Title = "Fizika", Description = "Mehanika", InstructorId = instructor.Id };
         await courseService.UpdateCourseAsync(created.Id, updateDto);
         var updated = await courseService.GetCourseAsync(created.Id);
-        Assert.Equal("Fizika", updated.Name);
+        Assert.Equal("Fizika", updated.Title);
 
         // Delete
         await courseService.DeleteCourseAsync(created.Id);

@@ -9,12 +9,12 @@ namespace CoursePlatform.Tests.Services;
 
 public class StudentServiceTests
 {
-    private CoursePlatformDbContext GetDbContext(string dbName)
+    private CoursePlatformContext GetDbContext(string dbName)
     {
-        var options = new DbContextOptionsBuilder<CoursePlatformDbContext>()
+        var options = new DbContextOptionsBuilder<CoursePlatformContext>()
             .UseInMemoryDatabase(databaseName: dbName)
             .Options;
-        return new CoursePlatformDbContext(options);
+        return new CoursePlatformContext(options);
     }
 
     [Fact]
@@ -24,11 +24,11 @@ public class StudentServiceTests
         var repo = new StudentRepository(db);
         var service = new StudentService(repo);
 
-        var studentDto = new StudentRequestDTO { FirstName = "Nikola", LastName = "Jovanović", Email = "nikola.jovanovic@example.com" };
+        var studentDto = new StudentRequestDTO { Name = "Nikola Jovanović", Email = "nikola.jovanovic@example.com" };
         var created = await service.CreateStudentAsync(studentDto);
 
         Assert.NotNull(created.Id);
-        Assert.Equal("Nikola", created.FirstName);
+        Assert.Equal("Nikola Jovanović", created.Name);
     }
 
     [Fact]
@@ -38,11 +38,11 @@ public class StudentServiceTests
         var repo = new StudentRepository(db);
         var service = new StudentService(repo);
 
-        var studentDto = new StudentRequestDTO { FirstName = "Nikola", LastName = "Jovanović", Email = "nikola.jovanovic@example.com" };
+        var studentDto = new StudentRequestDTO { Name = "Nikola Jovanović", Email = "nikola.jovanovic@example.com" };
         var created = await service.CreateStudentAsync(studentDto);
 
         var fetched = await service.GetStudentByIdAsync(created.Id);
-        Assert.Equal("Nikola", fetched.FirstName);
+        Assert.Equal("Nikola Jovanović", fetched.Name);
     }
 
     [Fact]
@@ -52,14 +52,14 @@ public class StudentServiceTests
         var repo = new StudentRepository(db);
         var service = new StudentService(repo);
 
-        var studentDto = new StudentRequestDTO { FirstName = "Nikola", LastName = "Jovanović", Email = "nikola.jovanovic@example.com" };
+        var studentDto = new StudentRequestDTO { Name = "Nikola Jovanović", Email = "nikola.jovanovic@example.com" };
         var created = await service.CreateStudentAsync(studentDto);
 
-        var updateDto = new StudentRequestDTO { FirstName = "Ana", LastName = "Jovanović", Email = "ana.jovanovic@example.com" };
+        var updateDto = new StudentRequestDTO { Name = "Ana Jovanović", Email = "ana.jovanovic@example.com" };
         await service.UpdateStudentAsync(created.Id, updateDto);
 
         var updated = await service.GetStudentByIdAsync(created.Id);
-        Assert.Equal("Ana", updated.FirstName);
+        Assert.Equal("Ana Jovanović", updated.Name);
         Assert.Equal("ana.jovanovic@example.com", updated.Email);
     }
 
@@ -70,7 +70,7 @@ public class StudentServiceTests
         var repo = new StudentRepository(db);
         var service = new StudentService(repo);
 
-        var studentDto = new StudentRequestDTO { FirstName = "Nikola", LastName = "Jovanović", Email = "nikola.jovanovic@example.com" };
+        var studentDto = new StudentRequestDTO { Name = "Nikola Jovanović", Email = "nikola.jovanovic@example.com" };
         var created = await service.CreateStudentAsync(studentDto);
 
         await service.DeleteStudentAsync(created.Id);

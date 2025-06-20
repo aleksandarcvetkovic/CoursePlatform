@@ -9,12 +9,12 @@ namespace CoursePlatform.Tests.Services;
 
 public class InstructorServiceTests
 {
-    private CoursePlatformDbContext GetDbContext(string dbName)
+    private CoursePlatformContext GetDbContext(string dbName)
     {
-        var options = new DbContextOptionsBuilder<CoursePlatformDbContext>()
+        var options = new DbContextOptionsBuilder<CoursePlatformContext>()
             .UseInMemoryDatabase(databaseName: dbName)
             .Options;
-        return new CoursePlatformDbContext(options);
+        return new CoursePlatformContext(options);
     }
 
     [Fact]
@@ -24,12 +24,11 @@ public class InstructorServiceTests
         var repo = new InstructorRepository(db);
         var service = new InstructorService(repo);
 
-        var instructorDto = new InstructorRequestDTO { FirstName = "Miloš", LastName = "Petrović", Email = "milos.petrovic@example.com" };
+        var instructorDto = new InstructorRequestDTO { Name = "Miloš Petrović", Email = "milos.petrovic@example.com" };
         var created = await service.CreateInstructorAsync(instructorDto);
 
         Assert.NotNull(created.Id);
-        Assert.Equal("Miloš", created.FirstName);
-        Assert.Equal("Petrović", created.LastName);
+        Assert.Equal("Miloš Petrović", created.Name);
         Assert.Equal("milos.petrovic@example.com", created.Email);
     }
 
@@ -40,13 +39,12 @@ public class InstructorServiceTests
         var repo = new InstructorRepository(db);
         var service = new InstructorService(repo);
 
-        var instructorDto = new InstructorRequestDTO { FirstName = "Miloš", LastName = "Petrović", Email = "milos.petrovic@example.com" };
+        var instructorDto = new InstructorRequestDTO { Name = "Miloš Petrović", Email = "milos.petrovic@example.com" };
         var created = await service.CreateInstructorAsync(instructorDto);
 
         var fetched = await service.GetInstructorByIdAsync(created.Id);
 
-        Assert.Equal("Miloš", fetched.FirstName);
-        Assert.Equal("Petrović", fetched.LastName);
+        Assert.Equal("Miloš Petrović", fetched.Name);
         Assert.Equal("milos.petrovic@example.com", fetched.Email);
     }
 
@@ -57,15 +55,14 @@ public class InstructorServiceTests
         var repo = new InstructorRepository(db);
         var service = new InstructorService(repo);
 
-        var instructorDto = new InstructorRequestDTO { FirstName = "Miloš", LastName = "Petrović", Email = "milos.petrovic@example.com" };
+        var instructorDto = new InstructorRequestDTO { Name = "Miloš Petrović", Email = "milos.petrovic@example.com" };
         var created = await service.CreateInstructorAsync(instructorDto);
 
-        var updateDto = new InstructorRequestDTO { FirstName = "Jovan", LastName = "Petrović", Email = "jovan.petrovic@example.com" };
+        var updateDto = new InstructorRequestDTO { Name = "Jovan Petrović", Email = "jovan.petrovic@example.com" };
         await service.UpdateInstructorAsync(created.Id, updateDto);
 
         var updated = await service.GetInstructorByIdAsync(created.Id);
-        Assert.Equal("Jovan", updated.FirstName);
-        Assert.Equal("Petrović", updated.LastName);
+        Assert.Equal("Jovan Petrović", updated.Name);
         Assert.Equal("jovan.petrovic@example.com", updated.Email);
     }
 
@@ -76,7 +73,7 @@ public class InstructorServiceTests
         var repo = new InstructorRepository(db);
         var service = new InstructorService(repo);
 
-        var instructorDto = new InstructorRequestDTO { FirstName = "Miloš", LastName = "Petrović", Email = "milos.petrovic@example.com" };
+        var instructorDto = new InstructorRequestDTO { Name = "Miloš Petrović", Email = "milos.petrovic@example.com" };
         var created = await service.CreateInstructorAsync(instructorDto);
 
         await service.DeleteInstructorAsync(created.Id);
@@ -84,3 +81,4 @@ public class InstructorServiceTests
         await Assert.ThrowsAsync<NotFoundException>(() => service.GetInstructorByIdAsync(created.Id));
     }
 }
+    
