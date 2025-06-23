@@ -20,7 +20,6 @@
   <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\CoursePlatform\CoursePlatform.csproj" />
   </ItemGroup>
