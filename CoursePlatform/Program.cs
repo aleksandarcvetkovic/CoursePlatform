@@ -1,28 +1,16 @@
-using CoursePlatform.Models;
-using Microsoft.EntityFrameworkCore;
-using CoursePlatform.Services;
-using CoursePlatform.Repositories;
-using CoursePlatform.Endpoints;
+using CoursePlatform.Application;
+using CoursePlatform.Infrastructure;
+using CoursePlatform.Presentation.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.Services.AddDbContext<CoursePlatformContext>(options =>
-    options.UseSqlServer(builder.Configuration["DefaultConnection"]));
-
-builder.Services.AddScoped<IStudentService, StudentService>();
-builder.Services.AddScoped<IInstructorService, InstructorService>();
-builder.Services.AddScoped<ICourseService, CourseService>();
-builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
-builder.Services.AddScoped<IStudentRepository, StudentRepository>();
-builder.Services.AddScoped<IInstructorRepository, InstructorRepository>();
-builder.Services.AddScoped<ICourseRepository, CourseRepository>();
-builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
+// Add layers
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
@@ -36,17 +24,16 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseMiddleware<CoursePlatform.Middleware.GlobalExceptionMiddleware>();
+app.UseMiddleware<CoursePlatform.Application.Common.Middleware.GlobalExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
+// Map endpoints
 app.MapStudentEndpoints();
 app.MapInstructorEndpoints();
 app.MapCourseEndpoints();
 app.MapEnrollmentEndpoints();
-
-app.Run();
 
 app.Run();
