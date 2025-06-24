@@ -23,12 +23,10 @@ public static class EnrollmentEndpoints
     {
         var enrollments = await mediator.Send(new GetAllEnrollmentsQuery());
         return Results.Ok(enrollments);
-    }
-
-    private static async Task<IResult> CreateEnrollmentAsync(IMediator mediator, EnrollmentRequestDTO enrollmentRequest)
+    }    private static async Task<IResult> CreateEnrollmentAsync(IMediator mediator, EnrollmentRequestDTO enrollmentRequest)
     {
         var enrollment = await mediator.Send(new CreateEnrollmentCommand(enrollmentRequest));
-        return Results.CreatedAtRoute("GetEnrollmentById", new { id = enrollment.Id }, enrollment);
+        return Results.Created($"{RoutePrefix}/{enrollment.Id}", enrollment);
     }
 
     private static async Task<IResult> UpdateEnrollmentGradeAsync(IMediator mediator, string id, EnrollmentGradeRequestDTO gradeRequest)

@@ -51,12 +51,10 @@ public static class StudentEndpoints
         {
             return Results.NotFound($"Student with ID {id} not found");
         }
-    }
-
-    private static async Task<IResult> CreateStudentAsync(IMediator mediator, StudentRequestDTO studentRequest)
+    }    private static async Task<IResult> CreateStudentAsync(IMediator mediator, StudentRequestDTO studentRequest)
     {
         var student = await mediator.Send(new CreateStudentCommand(studentRequest));
-        return Results.CreatedAtRoute("GetStudentById", new { id = student.Id }, student);
+        return Results.Created($"{RoutePrefix}/{student.Id}", student);
     }
 
     private static async Task<IResult> UpdateStudentAsync(IMediator mediator, string id, StudentRequestDTO studentRequest)

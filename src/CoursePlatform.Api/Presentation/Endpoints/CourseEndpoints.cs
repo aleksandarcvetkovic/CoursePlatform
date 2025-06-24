@@ -7,9 +7,7 @@ namespace CoursePlatform.Api.Presentation.Endpoints;
 
 public static class CourseEndpoints
 {
-    private const string RoutePrefix = "/api/course";
-
-    public static void MapCourseEndpoints(this IEndpointRouteBuilder app)
+    private const string RoutePrefix = "/api/course";    public static void MapCourseEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapGet($"{RoutePrefix}", GetAllCoursesAsync);
         app.MapGet($"{RoutePrefix}/{{id}}", GetCourseByIdAsync);
@@ -35,12 +33,10 @@ public static class CourseEndpoints
     {
         var course = await mediator.Send(new GetCourseWithInstructorQuery(id));
         return course is not null ? Results.Ok(course) : Results.NotFound();
-    }
-
-    private static async Task<IResult> CreateCourseAsync(IMediator mediator, CourseRequestDTO courseRequest)
+    }    private static async Task<IResult> CreateCourseAsync(IMediator mediator, CourseRequestDTO courseRequest)
     {
         var course = await mediator.Send(new CreateCourseCommand(courseRequest));
-        return Results.CreatedAtRoute("GetCourseById", new { id = course.Id }, course);
+        return Results.Created($"{RoutePrefix}/{course.Id}", course);
     }
 
     private static async Task<IResult> UpdateCourseAsync(IMediator mediator, string id, CourseRequestDTO courseRequest)
