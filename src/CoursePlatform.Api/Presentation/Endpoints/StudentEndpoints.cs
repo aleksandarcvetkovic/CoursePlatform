@@ -6,7 +6,7 @@ using CoursePlatform.Application.Features.Students.Queries.GetStudentById;
 using CoursePlatform.Application.Features.Students.Queries.GetStudentWithEnrollments;
 using CoursePlatform.Application.DTOs;
 using MediatR;
-using PaymentProcessing.Api.Endpoints.Internal;
+using CoursePlatform.Api.Presentation.Endpoints.Internal;
 
 namespace CoursePlatform.Api.Presentation.Endpoints;
 
@@ -45,11 +45,17 @@ public class StudentEndpoints : IEndpoint
             .Produces(StatusCodes.Status404NotFound);
     }
 
+    [EndpointSummary("Get all students")]
+    [EndpointDescription("Retrieves a list of all students in the system.")]
     private static async Task<IResult> GetAllStudentsAsync(IMediator mediator)
     {
         var students = await mediator.Send(new GetAllStudentsQuery());
         return Results.Ok(students);
-    }    private static async Task<IResult> GetStudentByIdAsync(IMediator mediator, string id)
+    }
+
+    [EndpointSummary("Get student by ID")]
+    [EndpointDescription("Retrieves a student by their unique identifier.")]
+    private static async Task<IResult> GetStudentByIdAsync(IMediator mediator, string id)
     {
         try
         {
@@ -62,6 +68,8 @@ public class StudentEndpoints : IEndpoint
         }
     }
 
+    [EndpointSummary("Get student with enrollments")]
+    [EndpointDescription("Retrieves a student along with their enrollment information by student ID.")]
     private static async Task<IResult> GetStudentWithEnrollmentsAsync(IMediator mediator, string id)
     {
         try
@@ -73,18 +81,26 @@ public class StudentEndpoints : IEndpoint
         {
             return Results.NotFound($"Student with ID {id} not found");
         }
-    }    private static async Task<IResult> CreateStudentAsync(IMediator mediator, StudentRequestDTO studentRequest)
+    }
+
+    [EndpointSummary("Create a new student")]
+    [EndpointDescription("Creates a new student with the provided information.")]
+    private static async Task<IResult> CreateStudentAsync(IMediator mediator, StudentRequestDTO studentRequest)
     {
         var student = await mediator.Send(new CreateStudentCommand(studentRequest));
         return Results.Created($"{BaseRoute}/{student.Id}", student);
     }
 
+    [EndpointSummary("Update an existing student")]
+    [EndpointDescription("Updates an existing student's information using their ID.")]
     private static async Task<IResult> UpdateStudentAsync(IMediator mediator, string id, StudentRequestDTO studentRequest)
     {
         var student = await mediator.Send(new UpdateStudentCommand(id, studentRequest));
         return Results.Ok(student);
     }
 
+    [EndpointSummary("Delete a student")]
+    [EndpointDescription("Deletes an existing student by their ID.")]
     private static async Task<IResult> DeleteStudentAsync(IMediator mediator, string id)
     {
         await mediator.Send(new DeleteStudentCommand(id));

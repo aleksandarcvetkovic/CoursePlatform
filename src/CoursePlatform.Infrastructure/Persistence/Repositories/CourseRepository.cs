@@ -9,7 +9,9 @@ public class CourseRepository : GenericRepository<Course>, ICourseRepository
 {
     public CourseRepository(ApplicationDbContext context) : base(context)
     {
-    }    public async Task<Course?> GetByIdWithInstructorAsync(string id, CancellationToken cancellationToken = default)
+    }
+
+    public async Task<Course?> GetByIdWithInstructorAsync(string id, CancellationToken cancellationToken = default)
     {
         return await _dbSet
             .Include(c => c.Instructor)

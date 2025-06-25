@@ -1,6 +1,7 @@
 using CoursePlatform.Domain.Common;
 using CoursePlatform.Domain.Repositories;
 using CoursePlatform.Infrastructure.Persistence.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace CoursePlatform.Infrastructure.Persistence;
@@ -25,6 +26,15 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     public IEnrollmentRepository Enrollments { get; }
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
+        // Update timestamps for modified entities
+        var entries = _context.ChangeTracker.Entries<BaseEntity>()
+            .Where(e => e.State == EntityState.Modified);
+
+        foreach (var entry in entries)
+        {
+            entry.Entity.UpdatedAt = DateTime.UtcNow;
+        }
+
         return await _context.SaveChangesAsync(cancellationToken);
     }
 

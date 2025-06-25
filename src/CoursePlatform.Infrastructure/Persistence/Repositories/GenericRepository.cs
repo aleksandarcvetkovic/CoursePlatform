@@ -47,4 +47,5 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEnt
     public virtual async Task<bool> ExistsAsync(string id, CancellationToken cancellationToken = default)
     {
         return await _dbSet.AnyAsync(e => e.Id == id, cancellationToken);
-    }}
+    }
+}

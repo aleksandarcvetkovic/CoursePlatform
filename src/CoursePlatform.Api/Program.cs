@@ -2,7 +2,7 @@ using CoursePlatform.Application;
 using CoursePlatform.Infrastructure;
 using CoursePlatform.Api.Presentation.Endpoints;
 using CoursePlatform.Api.Common.Middleware;
-using PaymentProcessing.Api.Endpoints.Internal;
+using CoursePlatform.Api.Presentation.Endpoints.Internal;
 
 var builder = WebApplication.CreateBuilder(args);
 

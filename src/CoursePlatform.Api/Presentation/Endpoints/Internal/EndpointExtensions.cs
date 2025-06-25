@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace PaymentProcessing.Api.Endpoints.Internal;
+namespace CoursePlatform.Api.Presentation.Endpoints.Internal;
 
 public static class EndpointsExtensions
 {

@@ -2,7 +2,7 @@ namespace CoursePlatform.Infrastructure.Common.Options;
 
 public class DatabaseOptions
 {
-    //public const string SectionName = "DatabaseOptions";
+    public const string SectionName = "DatabaseOptions";
     
     public string ConnectionString { get; set; } = string.Empty;
     public int MaxRetryCount { get; set; } = 5;

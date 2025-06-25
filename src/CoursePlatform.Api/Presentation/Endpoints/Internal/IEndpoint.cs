@@ -1,4 +1,4 @@
-namespace PaymentProcessing.Api.Endpoints.Internal;
+namespace CoursePlatform.Api.Presentation.Endpoints.Internal;
 
 public interface IEndpoint
 {

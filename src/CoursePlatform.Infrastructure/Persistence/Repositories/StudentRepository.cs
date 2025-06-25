@@ -9,7 +9,9 @@ public class StudentRepository : GenericRepository<Student>, IStudentRepository
 {
     public StudentRepository(ApplicationDbContext context) : base(context)
     {
-    }    public async Task<Student?> GetByIdWithEnrollmentsAsync(string id, CancellationToken cancellationToken = default)
+    }
+
+    public async Task<Student?> GetByIdWithEnrollmentsAsync(string id, CancellationToken cancellationToken = default)
     {
         return await _dbSet
             .Include(s => s.Enrollments)

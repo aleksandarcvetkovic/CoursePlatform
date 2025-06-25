@@ -15,7 +15,7 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructureExtension(this IServiceCollection services, IConfiguration configuration)
     {
         // Configure the DatabaseOptions options
-        services.Configure<DatabaseOptions>(configuration.GetSection("DatabaseOptions"));
+        services.Configure<DatabaseOptions>(configuration.GetSection(DatabaseOptions.SectionName));
         services.AddSingleton<IValidateOptions<DatabaseOptions>, DatabaseSettingsValidator>();
         
         services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
@@ -26,7 +26,7 @@ public static class DependencyInjection
             {
                 throw new InvalidOperationException("Database connection string is null or empty! Check your appsettings.json configuration.");
             }
-            
+
             if (databaseSettings.EnableRetryOnFailure)
             {
                 options.UseSqlServer(databaseSettings.ConnectionString,
