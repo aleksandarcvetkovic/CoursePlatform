@@ -22,11 +22,15 @@ namespace CoursePlatform.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("CoursePlatform.Models.Course", b =>
+            modelBuilder.Entity("CoursePlatform.Domain.Entities.Course", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(450)")
+                        .HasDefaultValueSql("NEWID()");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -40,6 +44,9 @@ namespace CoursePlatform.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("InstructorId");
@@ -47,15 +54,19 @@ namespace CoursePlatform.Migrations
                     b.ToTable("Courses");
                 });
 
-            modelBuilder.Entity("CoursePlatform.Models.Enrollment", b =>
+            modelBuilder.Entity("CoursePlatform.Domain.Entities.Enrollment", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(450)")
+                        .HasDefaultValueSql("NEWID()");
 
                     b.Property<string>("CourseId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("EnrolledOn")
                         .HasColumnType("datetime2");
@@ -67,6 +78,9 @@ namespace CoursePlatform.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CourseId");
@@ -76,11 +90,15 @@ namespace CoursePlatform.Migrations
                     b.ToTable("Enrollments");
                 });
 
-            modelBuilder.Entity("CoursePlatform.Models.Instructor", b =>
+            modelBuilder.Entity("CoursePlatform.Domain.Entities.Instructor", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(450)")
+                        .HasDefaultValueSql("NEWID()");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -89,17 +107,24 @@ namespace CoursePlatform.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
                     b.ToTable("Instructors");
                 });
 
-            modelBuilder.Entity("CoursePlatform.Models.Student", b =>
+            modelBuilder.Entity("CoursePlatform.Domain.Entities.Student", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(450)")
+                        .HasDefaultValueSql("NEWID()");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -109,14 +134,17 @@ namespace CoursePlatform.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.ToTable("Students");
                 });
 
-            modelBuilder.Entity("CoursePlatform.Models.Course", b =>
+            modelBuilder.Entity("CoursePlatform.Domain.Entities.Course", b =>
                 {
-                    b.HasOne("CoursePlatform.Models.Instructor", "Instructor")
+                    b.HasOne("CoursePlatform.Domain.Entities.Instructor", "Instructor")
                         .WithMany("Courses")
                         .HasForeignKey("InstructorId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -125,15 +153,15 @@ namespace CoursePlatform.Migrations
                     b.Navigation("Instructor");
                 });
 
-            modelBuilder.Entity("CoursePlatform.Models.Enrollment", b =>
+            modelBuilder.Entity("CoursePlatform.Domain.Entities.Enrollment", b =>
                 {
-                    b.HasOne("CoursePlatform.Models.Course", "Course")
+                    b.HasOne("CoursePlatform.Domain.Entities.Course", "Course")
                         .WithMany("Enrollments")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CoursePlatform.Models.Student", "Student")
+                    b.HasOne("CoursePlatform.Domain.Entities.Student", "Student")
                         .WithMany("Enrollments")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -144,17 +172,17 @@ namespace CoursePlatform.Migrations
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("CoursePlatform.Models.Course", b =>
+            modelBuilder.Entity("CoursePlatform.Domain.Entities.Course", b =>
                 {
                     b.Navigation("Enrollments");
                 });
 
-            modelBuilder.Entity("CoursePlatform.Models.Instructor", b =>
+            modelBuilder.Entity("CoursePlatform.Domain.Entities.Instructor", b =>
                 {
                     b.Navigation("Courses");
                 });
 
-            modelBuilder.Entity("CoursePlatform.Models.Student", b =>
+            modelBuilder.Entity("CoursePlatform.Domain.Entities.Student", b =>
                 {
                     b.Navigation("Enrollments");
                 });

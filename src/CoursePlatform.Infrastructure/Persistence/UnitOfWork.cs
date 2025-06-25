@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace CoursePlatform.Infrastructure.Persistence;
 
-public class UnitOfWork : IUnitOfWork
+public class UnitOfWork : IUnitOfWork, IDisposable
 {
     private readonly ApplicationDbContext _context;
     private IDbContextTransaction? _transaction;
@@ -23,10 +23,8 @@ public class UnitOfWork : IUnitOfWork
     public ICourseRepository Courses { get; }
     public IInstructorRepository Instructors { get; }
     public IEnrollmentRepository Enrollments { get; }
-
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        await DispatchDomainEventsAsync();
         return await _context.SaveChangesAsync(cancellationToken);
     }
 
@@ -52,26 +50,6 @@ public class UnitOfWork : IUnitOfWork
             await _transaction.RollbackAsync(cancellationToken);
             await _transaction.DisposeAsync();
             _transaction = null;
-        }
-    }
-
-    private async Task DispatchDomainEventsAsync()
-    {
-        var domainEntities = _context.ChangeTracker
-            .Entries<BaseEntity>()
-            .Where(x => x.Entity.DomainEvents.Any())
-            .ToList();
-
-        var domainEvents = domainEntities
-            .SelectMany(x => x.Entity.DomainEvents)
-            .ToList();
-
-        domainEntities.ForEach(entity => entity.Entity.ClearDomainEvents());
-
-        foreach (var domainEvent in domainEvents)
-        {
-            // Here you could publish domain events using MediatR or other event dispatcher
-            // For now, we'll just clear them
         }
     }
 

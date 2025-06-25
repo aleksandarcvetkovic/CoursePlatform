@@ -1,5 +1,4 @@
 using CoursePlatform.Domain.Common;
-using CoursePlatform.Domain.Events.Students;
 
 namespace CoursePlatform.Domain.Entities;
 
@@ -23,8 +22,6 @@ public class Student : BaseEntity
             Name = name.Trim(),
             Email = email.Trim().ToLowerInvariant()
         };
-
-        student.AddDomainEvent(new StudentCreatedEvent(student.Id, student.Name, student.Email));
         return student;
     }
 

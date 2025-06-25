@@ -14,16 +14,9 @@ public static class CourseMappingExtensions
             Description = course.Description,
             InstructorId = course.InstructorId
         };
-    }
-
-    public static Course ToCourse(this CourseRequestDTO courseDTO)
+    }    public static Course ToCourse(this CourseRequestDTO courseDTO)
     {
-        return new Course
-        {
-            Title = courseDTO.Title,
-            Description = courseDTO.Description,
-            InstructorId = courseDTO.InstructorId
-        };
+        return Course.Create(courseDTO.Title, courseDTO.Description, courseDTO.InstructorId);
     }
 
     public static CourseWithInstructorDTO ToCourseWithInstructorDTO(this Course course)
@@ -37,13 +30,9 @@ public static class CourseMappingExtensions
             InstructorName = course.Instructor?.Name ?? string.Empty,
             InstructorEmail = course.Instructor?.Email ?? string.Empty
         };
-    }
-
-    public static void UpdateFromDTO(this Course course, CourseRequestDTO courseDTO)
+    }    public static void UpdateFromDTO(this Course course, CourseRequestDTO courseDTO)
     {
-        course.Title = courseDTO.Title;
-        course.Description = courseDTO.Description;
-        course.InstructorId = courseDTO.InstructorId;
+        course.Update(courseDTO.Title, courseDTO.Description, courseDTO.InstructorId);
     }
 
     public static IEnumerable<CourseResponseDTO> ToCourseResponseDTOs(this IEnumerable<Course> courses)

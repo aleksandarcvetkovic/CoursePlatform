@@ -1,5 +1,4 @@
 using CoursePlatform.Domain.Common;
-using CoursePlatform.Domain.Events.Enrollments;
 
 namespace CoursePlatform.Domain.Entities;
 
@@ -23,7 +22,6 @@ public class Enrollment : BaseEntity
             EnrolledOn = DateTime.UtcNow
         };
 
-        enrollment.AddDomainEvent(new EnrollmentCreatedEvent(enrollment.Id, studentId, courseId));
         return enrollment;
     }
 
