@@ -4,19 +4,33 @@ using CoursePlatform.Application.Features.Enrollments.Commands.UpdateEnrollmentG
 using CoursePlatform.Application.Features.Enrollments.Queries.GetAllEnrollments;
 using CoursePlatform.Application.DTOs;
 using MediatR;
+using PaymentProcessing.Api.Endpoints.Internal;
 
 namespace CoursePlatform.Api.Presentation.Endpoints;
-
-public static class EnrollmentEndpoints
+public class EnrollmentEndpoints : IEndpoint
 {
-    private const string RoutePrefix = "/api/enrollment";
+    public static string BaseRoute =>"/api/enrollment";
 
-    public static void MapEnrollmentEndpoints(this IEndpointRouteBuilder app)
+
+    public static void DefineEndpoints(IEndpointRouteBuilder app)
     {
-        app.MapGet($"{RoutePrefix}", GetAllEnrollmentsAsync);
-        app.MapPost($"{RoutePrefix}", CreateEnrollmentAsync);
-        app.MapPut($"{RoutePrefix}/{{id}}/grade", UpdateEnrollmentGradeAsync);
-        app.MapDelete($"{RoutePrefix}/{{id}}", DeleteEnrollmentAsync);
+        app.MapGet($"{BaseRoute}", GetAllEnrollmentsAsync)
+            .DefineDefaultResponseCodes()
+            .Produces<List<EnrollmentResponseDTO>>();
+
+        app.MapPost($"{BaseRoute}", CreateEnrollmentAsync)
+            .DefineDefaultResponseCodes()
+            .Produces<EnrollmentResponseDTO>(StatusCodes.Status201Created);
+
+        app.MapPut($"{BaseRoute}/{{id}}/grade", UpdateEnrollmentGradeAsync)
+            .DefineDefaultResponseCodes()
+            .Produces<EnrollmentResponseDTO>()
+            .Produces(StatusCodes.Status404NotFound);
+
+        app.MapDelete($"{BaseRoute}/{{id}}", DeleteEnrollmentAsync)
+            .DefineDefaultResponseCodes()
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound);
     }
 
     private static async Task<IResult> GetAllEnrollmentsAsync(IMediator mediator)
@@ -26,7 +40,7 @@ public static class EnrollmentEndpoints
     }    private static async Task<IResult> CreateEnrollmentAsync(IMediator mediator, EnrollmentRequestDTO enrollmentRequest)
     {
         var enrollment = await mediator.Send(new CreateEnrollmentCommand(enrollmentRequest));
-        return Results.Created($"{RoutePrefix}/{enrollment.Id}", enrollment);
+        return Results.Created($"{BaseRoute}/{enrollment.Id}", enrollment);
     }
 
     private static async Task<IResult> UpdateEnrollmentGradeAsync(IMediator mediator, string id, EnrollmentGradeRequestDTO gradeRequest)

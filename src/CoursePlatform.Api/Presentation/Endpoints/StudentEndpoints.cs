@@ -6,21 +6,43 @@ using CoursePlatform.Application.Features.Students.Queries.GetStudentById;
 using CoursePlatform.Application.Features.Students.Queries.GetStudentWithEnrollments;
 using CoursePlatform.Application.DTOs;
 using MediatR;
+using PaymentProcessing.Api.Endpoints.Internal;
 
 namespace CoursePlatform.Api.Presentation.Endpoints;
 
-public static class StudentEndpoints
+public class StudentEndpoints : IEndpoint
 {
-    private const string RoutePrefix = "/api/student";
+    public static string BaseRoute => "/api/student";
 
-    public static void MapStudentEndpoints(this IEndpointRouteBuilder app)
+    public static void DefineEndpoints(IEndpointRouteBuilder app)
     {
-        app.MapGet($"{RoutePrefix}", GetAllStudentsAsync);
-        app.MapGet($"{RoutePrefix}/{{id}}", GetStudentByIdAsync);
-        app.MapGet($"{RoutePrefix}/StudentWithEnrollments/{{id}}", GetStudentWithEnrollmentsAsync);
-        app.MapPut($"{RoutePrefix}/{{id}}", UpdateStudentAsync);
-        app.MapPost($"{RoutePrefix}", CreateStudentAsync);
-        app.MapDelete($"{RoutePrefix}/{{id}}", DeleteStudentAsync);
+        app.MapGet($"{BaseRoute}", GetAllStudentsAsync)
+            .DefineDefaultResponseCodes()
+            .Produces<List<StudentResponseDTO>>();
+
+        app.MapGet($"{BaseRoute}/{{id}}", GetStudentByIdAsync)
+            .DefineDefaultResponseCodes()
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces<StudentResponseDTO>();
+
+        app.MapGet($"{BaseRoute}/StudentWithEnrollments/{{id}}", GetStudentWithEnrollmentsAsync)
+            .DefineDefaultResponseCodes()
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces<StudentWithEnrollmentsDTO>();
+
+        app.MapPut($"{BaseRoute}/{{id}}", UpdateStudentAsync)
+            .DefineDefaultResponseCodes()
+            .Produces<StudentResponseDTO>()
+            .Produces(StatusCodes.Status404NotFound);
+
+        app.MapPost($"{BaseRoute}", CreateStudentAsync)
+            .DefineDefaultResponseCodes()
+            .Produces<StudentResponseDTO>(StatusCodes.Status201Created);
+
+        app.MapDelete($"{BaseRoute}/{{id}}", DeleteStudentAsync)
+            .DefineDefaultResponseCodes()
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound);
     }
 
     private static async Task<IResult> GetAllStudentsAsync(IMediator mediator)
@@ -54,7 +76,7 @@ public static class StudentEndpoints
     }    private static async Task<IResult> CreateStudentAsync(IMediator mediator, StudentRequestDTO studentRequest)
     {
         var student = await mediator.Send(new CreateStudentCommand(studentRequest));
-        return Results.Created($"{RoutePrefix}/{student.Id}", student);
+        return Results.Created($"{BaseRoute}/{student.Id}", student);
     }
 
     private static async Task<IResult> UpdateStudentAsync(IMediator mediator, string id, StudentRequestDTO studentRequest)

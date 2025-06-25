@@ -5,21 +5,43 @@ using CoursePlatform.Application.Features.Instructors.Queries.GetAllInstructors;
 using CoursePlatform.Application.Features.Instructors.Queries.GetInstructorById;
 using CoursePlatform.Application.DTOs;
 using MediatR;
+using PaymentProcessing.Api.Endpoints.Internal;
 
 namespace CoursePlatform.Api.Presentation.Endpoints;
 
-public static class InstructorEndpoints
+public class InstructorEndpoints : IEndpoint
 {
-    private const string RoutePrefix = "/api/instructor";
+    public static string BaseRoute => "/api/instructor";
 
-    public static void MapInstructorEndpoints(this IEndpointRouteBuilder app)
+    public static void DefineEndpoints(IEndpointRouteBuilder app)
     {
-        app.MapGet($"{RoutePrefix}", GetAllInstructorsAsync);
-        app.MapGet($"{RoutePrefix}/{{id}}", GetInstructorByIdAsync).WithName("GetInstructorById");
-        app.MapGet($"{RoutePrefix}/{{id}}/courses", GetInstructorWithCoursesAsync);
-        app.MapPost($"{RoutePrefix}", CreateInstructorAsync);
-        app.MapPut($"{RoutePrefix}/{{id}}", UpdateInstructorAsync);
-        app.MapDelete($"{RoutePrefix}/{{id}}", DeleteInstructorAsync);
+        app.MapGet($"{BaseRoute}", GetAllInstructorsAsync)
+            .DefineDefaultResponseCodes()
+            .Produces<List<InstructorResponseDTO>>();
+
+        app.MapGet($"{BaseRoute}/{{id}}", GetInstructorByIdAsync).WithName("GetInstructorById")
+            .DefineDefaultResponseCodes()
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces<InstructorResponseDTO>();
+
+        app.MapGet($"{BaseRoute}/{{id}}/courses", GetInstructorWithCoursesAsync)
+            .DefineDefaultResponseCodes()
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces<InstructorWithCoursesDTO>();
+
+        app.MapPost($"{BaseRoute}", CreateInstructorAsync)
+            .DefineDefaultResponseCodes()
+            .Produces<InstructorResponseDTO>(StatusCodes.Status201Created);
+
+        app.MapPut($"{BaseRoute}/{{id}}", UpdateInstructorAsync)
+            .DefineDefaultResponseCodes()
+            .Produces<InstructorResponseDTO>()
+            .Produces(StatusCodes.Status404NotFound);
+            
+        app.MapDelete($"{BaseRoute}/{{id}}", DeleteInstructorAsync)
+            .DefineDefaultResponseCodes()
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound);
     }
 
     private static async Task<IResult> GetAllInstructorsAsync(IMediator mediator)

@@ -2,19 +2,46 @@ using CoursePlatform.Application.Features.Courses.Commands;
 using CoursePlatform.Application.Features.Courses.Queries;
 using CoursePlatform.Application.DTOs;
 using MediatR;
+using PaymentProcessing.Api.Endpoints.Internal;
 
 namespace CoursePlatform.Api.Presentation.Endpoints;
 
-public static class CourseEndpoints
+public class CourseEndpoints : IEndpoint
 {
-    private const string RoutePrefix = "/api/course";    public static void MapCourseEndpoints(this IEndpointRouteBuilder app)
+    
+    public static string BaseRoute => "/api/course";
+
+    public static void DefineEndpoints(IEndpointRouteBuilder app)
     {
-        app.MapGet($"{RoutePrefix}", GetAllCoursesAsync);
-        app.MapGet($"{RoutePrefix}/{{id}}", GetCourseByIdAsync);
-        app.MapGet($"{RoutePrefix}/CourseWithInstructor/{{id}}", GetCourseWithInstructorAsync);
-        app.MapPut($"{RoutePrefix}/{{id}}", UpdateCourseAsync);
-        app.MapPost($"{RoutePrefix}", CreateCourseAsync);
-        app.MapDelete($"{RoutePrefix}/{{id}}", DeleteCourseAsync);
+        app.MapGet($"{BaseRoute}", GetAllCoursesAsync)
+            .DefineDefaultResponseCodes()
+            .Produces<List<CourseResponseDTO>>();
+
+
+        app.MapGet($"{BaseRoute}/{{id}}", GetCourseByIdAsync)
+            .DefineDefaultResponseCodes()
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces<CourseResponseDTO>();
+
+        app.MapGet($"{BaseRoute}/CourseWithInstructor/{{id}}", GetCourseWithInstructorAsync)
+            .DefineDefaultResponseCodes()
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces<CourseWithInstructorDTO>();
+
+        app.MapPut($"{BaseRoute}/{{id}}", UpdateCourseAsync)
+            .DefineDefaultResponseCodes()
+            .Produces<CourseResponseDTO>()
+            .Produces(StatusCodes.Status404NotFound);
+
+
+        app.MapPost($"{BaseRoute}", CreateCourseAsync)
+            .DefineDefaultResponseCodes()
+            .Produces<CourseResponseDTO>(StatusCodes.Status201Created);
+
+        app.MapDelete($"{BaseRoute}/{{id}}", DeleteCourseAsync)
+            .DefineDefaultResponseCodes()
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound);
     }
 
     private static async Task<IResult> GetAllCoursesAsync(IMediator mediator)
@@ -36,7 +63,7 @@ public static class CourseEndpoints
     }    private static async Task<IResult> CreateCourseAsync(IMediator mediator, CourseRequestDTO courseRequest)
     {
         var course = await mediator.Send(new CreateCourseCommand(courseRequest));
-        return Results.Created($"{RoutePrefix}/{course.Id}", course);
+        return Results.Created($"{BaseRoute}/{course.Id}", course);
     }
 
     private static async Task<IResult> UpdateCourseAsync(IMediator mediator, string id, CourseRequestDTO courseRequest)

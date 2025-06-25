@@ -2,6 +2,7 @@ using CoursePlatform.Application;
 using CoursePlatform.Infrastructure;
 using CoursePlatform.Api.Presentation.Endpoints;
 using CoursePlatform.Api.Common.Middleware;
+using PaymentProcessing.Api.Endpoints.Internal;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +14,7 @@ builder.Services.AddSwaggerGen();
 
 // Add layers
 builder.Services.AddApplication();
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddInfrastructureExtension(builder.Configuration);
 
 var app = builder.Build();
 
@@ -31,10 +32,6 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-// Map endpoints
-app.MapStudentEndpoints();
-app.MapInstructorEndpoints();
-app.MapCourseEndpoints();
-app.MapEnrollmentEndpoints();
+app.MapEndpoints();
 
 app.Run();
