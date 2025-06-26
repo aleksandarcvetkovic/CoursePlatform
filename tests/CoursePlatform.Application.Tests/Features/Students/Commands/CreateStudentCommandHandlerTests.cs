@@ -1,9 +1,11 @@
 using CoursePlatform.Application.DTOs;
 using CoursePlatform.Application.Features.Students.Commands.CreateStudent;
+using CoursePlatform.Application.Services;
 using CoursePlatform.Domain.Entities;
 using CoursePlatform.Domain.Repositories;
 using FluentAssertions;
 using Moq;
+using Xunit;
 
 namespace CoursePlatform.Application.Tests.Features.Students.Commands;
 
@@ -11,14 +13,22 @@ public class CreateStudentCommandHandlerTests
 {
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly Mock<IStudentRepository> _studentRepositoryMock;
+    private readonly Mock<IStudentValidationService> _validationServiceMock;
     private readonly CreateStudentCommandHandler _handler;
 
     public CreateStudentCommandHandlerTests()
     {
         _unitOfWorkMock = new Mock<IUnitOfWork>();
         _studentRepositoryMock = new Mock<IStudentRepository>();
+        _validationServiceMock = new Mock<IStudentValidationService>();
         _unitOfWorkMock.Setup(x => x.Students).Returns(_studentRepositoryMock.Object);
-        _handler = new CreateStudentCommandHandler(_unitOfWorkMock.Object);
+        
+        // Setup validation service to return success by default
+        _validationServiceMock
+            .Setup(x => x.ValidateStudentAsync(It.IsAny<StudentRequestDTO>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(StudentValidationResult.Success());
+            
+        _handler = new CreateStudentCommandHandler(_unitOfWorkMock.Object, _validationServiceMock.Object);
     }
 
     private static CancellationToken GetCancellationToken() => CancellationToken.None;
@@ -87,5 +97,25 @@ public class CreateStudentCommandHandlerTests
 
         // Assert
         _unitOfWorkMock.Verify(x => x.SaveChangesAsync(cancellationToken), Times.Once);
+    }
+
+    [Fact]
+    public async Task Handle_WithInvalidStudent_ShouldThrowValidationException()
+    {
+        // Arrange
+        var studentRequest = GetValidStudentRequest();
+        var command = new CreateStudentCommand(studentRequest);
+        var cancellationToken = GetCancellationToken();
+
+        _validationServiceMock
+            .Setup(x => x.ValidateStudentAsync(It.IsAny<StudentRequestDTO>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(StudentValidationResult.Failure("Invalid student data", new List<string> { "Email already exists" }));
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<FluentValidation.ValidationException>(
+            () => _handler.Handle(command, cancellationToken));
+
+        exception.Errors.Should().NotBeEmpty();
+        exception.Errors.First().ErrorMessage.Should().Be("Email already exists");
     }
 }

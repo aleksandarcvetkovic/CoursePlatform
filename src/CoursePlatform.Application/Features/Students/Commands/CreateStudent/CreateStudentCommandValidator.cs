@@ -7,6 +7,8 @@ public class CreateStudentCommandValidator : AbstractValidator<CreateStudentComm
 {
     public CreateStudentCommandValidator()
     {
+        /*//Comented out as using external validation service
+        
         RuleFor(x => x.Student.Name)
             .NotEmpty().WithMessage("Name is required.")
             .MaximumLength(100).WithMessage("Name must not exceed 100 characters.");
@@ -15,5 +17,6 @@ public class CreateStudentCommandValidator : AbstractValidator<CreateStudentComm
             .NotEmpty().WithMessage("Email is required.")
             .EmailAddress().WithMessage("Email format is invalid.")
             .MaximumLength(255).WithMessage("Email must not exceed 255 characters.");
+            */
     }
 }
