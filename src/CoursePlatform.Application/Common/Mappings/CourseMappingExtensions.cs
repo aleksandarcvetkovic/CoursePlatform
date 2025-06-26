@@ -14,7 +14,8 @@ public static class CourseMappingExtensions
             Description = course.Description,
             InstructorId = course.InstructorId
         };
-    }    public static Course ToCourse(this CourseRequestDTO courseDTO)
+    }
+    public static Course ToCourse(this CourseRequestDTO courseDTO)
     {
         return Course.Create(courseDTO.Title, courseDTO.Description, courseDTO.InstructorId);
     }

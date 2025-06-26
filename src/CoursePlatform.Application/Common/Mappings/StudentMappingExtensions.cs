@@ -27,11 +27,7 @@ public static class StudentMappingExtensions
 
     public static Student ToStudent(this StudentRequestDTO studentDTO)
     {
-        return new Student
-        {
-            Name = studentDTO.Name,
-            Email = studentDTO.Email
-        };
+        return Student.Create(studentDTO.Name, studentDTO.Email);
     }
 
     public static StudentWithEnrollmentsDTO ToStudentWithEnrollmentsDTO(this Student student)
@@ -54,8 +50,7 @@ public static class StudentMappingExtensions
 
     public static void UpdateFromDTO(this Student student, StudentRequestDTO studentDTO)
     {
-        student.Name = studentDTO.Name;
-        student.Email = studentDTO.Email;
+        student.UpdateInfo(studentDTO.Name, studentDTO.Email);
     }
 
     public static IEnumerable<StudentResponseDTO> ToStudentResponseDTOs(this IEnumerable<Student> students)

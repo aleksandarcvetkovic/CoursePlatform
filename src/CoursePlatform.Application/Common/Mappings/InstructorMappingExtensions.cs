@@ -17,11 +17,7 @@ public static class InstructorMappingExtensions
 
     public static Instructor ToInstructor(this InstructorRequestDTO instructorDTO)
     {
-        return new Instructor
-        {
-            Name = instructorDTO.Name,
-            Email = instructorDTO.Email
-        };
+        return Instructor.Create(instructorDTO.Name, instructorDTO.Email);
     }
 
     public static InstructorWithCoursesDTO ToInstructorWithCoursesDTO(this Instructor instructor)
@@ -37,8 +33,7 @@ public static class InstructorMappingExtensions
 
     public static void UpdateFromDTO(this Instructor instructor, InstructorRequestDTO instructorDTO)
     {
-        instructor.Name = instructorDTO.Name;
-        instructor.Email = instructorDTO.Email;
+        instructor.UpdateInfo(instructorDTO.Name, instructorDTO.Email);
     }
 
     public static IEnumerable<InstructorResponseDTO> ToInstructorResponseDTOs(this IEnumerable<Instructor> instructors)

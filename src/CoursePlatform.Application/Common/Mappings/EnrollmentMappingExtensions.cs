@@ -19,13 +19,7 @@ public static class EnrollmentMappingExtensions
 
     public static Enrollment ToEnrollment(this EnrollmentRequestDTO enrollmentDTO)
     {
-        return new Enrollment
-        {
-            CourseId = enrollmentDTO.CourseId,
-            StudentId = enrollmentDTO.StudentId,
-            EnrolledOn = DateTime.UtcNow,
-            Grade = null
-        };
+        return Enrollment.Create(enrollmentDTO.StudentId, enrollmentDTO.CourseId);
     }
 
     public static EnrollmentWithStudentCourseDTO ToEnrollmentWithStudentCourseDTO(this Enrollment enrollment)
@@ -42,9 +36,9 @@ public static class EnrollmentMappingExtensions
         };
     }
 
-    public static void UpdateGrade(this Enrollment enrollment, double grade)
+    public static void UpdateGradeFromDTO(this Enrollment enrollment, double grade)
     {
-        enrollment.Grade = grade;
+        enrollment.UpdateGrade(grade);
     }
 
     public static IEnumerable<EnrollmentResponseDTO> ToEnrollmentResponseDTOs(this IEnumerable<Enrollment> enrollments)

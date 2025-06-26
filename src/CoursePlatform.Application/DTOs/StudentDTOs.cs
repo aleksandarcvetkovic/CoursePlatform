@@ -1,19 +1,19 @@
 namespace CoursePlatform.Application.DTOs;
 
-public class StudentRequestDTO
+public record StudentRequestDTO
 {
     public string Name { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
 }
 
-public class StudentResponseDTO
+public record StudentResponseDTO
 {
     public string Id { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
 }
 
-public class StudentWithEnrollmentsDTO
+public record StudentWithEnrollmentsDTO
 {
     public string Id { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
