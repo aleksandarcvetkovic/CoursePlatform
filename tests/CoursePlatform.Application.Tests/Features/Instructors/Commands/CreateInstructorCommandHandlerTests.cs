@@ -21,17 +21,15 @@ public class CreateInstructorCommandHandlerTests
         _handler = new CreateInstructorCommandHandler(_unitOfWorkMock.Object);
     }
 
+    private static CancellationToken GetCancellationToken() => CancellationToken.None;
+
     [Fact]
     public async Task Handle_WithValidInstructor_ShouldCreateInstructorSuccessfully()
     {
         // Arrange
-        var instructorRequest = new InstructorRequestDTO
-        {
-            Name = "Dr. Smith",
-            Email = "dr.smith@example.com"
-        };
+        var instructorRequest = GetValidInstructorRequest();
         var command = new CreateInstructorCommand(instructorRequest);
-        var cancellationToken = CancellationToken.None;
+        var cancellationToken = GetCancellationToken();
 
         _instructorRepositoryMock
             .Setup(x => x.AddAsync(It.IsAny<Instructor>(), cancellationToken))
@@ -54,13 +52,9 @@ public class CreateInstructorCommandHandlerTests
     public async Task Handle_WithValidInstructor_ShouldCallAddAsyncOnRepository()
     {
         // Arrange
-        var instructorRequest = new InstructorRequestDTO
-        {
-            Name = "Dr. Smith",
-            Email = "dr.smith@example.com"
-        };
+        var instructorRequest = GetValidInstructorRequest();
         var command = new CreateInstructorCommand(instructorRequest);
-        var cancellationToken = CancellationToken.None;
+        var cancellationToken = GetCancellationToken();
 
         // Act
         await _handler.Handle(command, cancellationToken);
@@ -75,13 +69,9 @@ public class CreateInstructorCommandHandlerTests
     public async Task Handle_WithValidInstructor_ShouldCallSaveChangesAsync()
     {
         // Arrange
-        var instructorRequest = new InstructorRequestDTO
-        {
-            Name = "Dr. Smith",
-            Email = "dr.smith@example.com"
-        };
+        var instructorRequest = GetValidInstructorRequest();
         var command = new CreateInstructorCommand(instructorRequest);
-        var cancellationToken = CancellationToken.None;
+        var cancellationToken = GetCancellationToken();
 
         // Act
         await _handler.Handle(command, cancellationToken);
@@ -94,13 +84,9 @@ public class CreateInstructorCommandHandlerTests
     public async Task Handle_WithEmptyName_ShouldThrowArgumentException()
     {
         // Arrange
-        var instructorRequest = new InstructorRequestDTO
-        {
-            Name = "",
-            Email = "dr.smith@example.com"
-        };
+        var instructorRequest = GetValidInstructorRequest() with { Name = "" };
         var command = new CreateInstructorCommand(instructorRequest);
-        var cancellationToken = CancellationToken.None;
+        var cancellationToken = GetCancellationToken();
 
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() => _handler.Handle(command, cancellationToken));
@@ -110,13 +96,9 @@ public class CreateInstructorCommandHandlerTests
     public async Task Handle_WithEmptyEmail_ShouldThrowArgumentException()
     {
         // Arrange
-        var instructorRequest = new InstructorRequestDTO
-        {
-            Name = "Dr. Smith",
-            Email = ""
-        };
+        var instructorRequest = GetValidInstructorRequest() with { Email = "" };
         var command = new CreateInstructorCommand(instructorRequest);
-        var cancellationToken = CancellationToken.None;
+        var cancellationToken = GetCancellationToken();
 
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() => _handler.Handle(command, cancellationToken));
@@ -126,13 +108,9 @@ public class CreateInstructorCommandHandlerTests
     public async Task Handle_WithNameContainingSpaces_ShouldTrimSpaces()
     {
         // Arrange
-        var instructorRequest = new InstructorRequestDTO
-        {
-            Name = "  Dr. Smith  ",
-            Email = "dr.smith@example.com"
-        };
+        var instructorRequest = GetValidInstructorRequest() with { Name = "  Dr. Smith  " };
         var command = new CreateInstructorCommand(instructorRequest);
-        var cancellationToken = CancellationToken.None;
+        var cancellationToken = GetCancellationToken();
 
         // Act
         var result = await _handler.Handle(command, cancellationToken);
@@ -145,13 +123,9 @@ public class CreateInstructorCommandHandlerTests
     public async Task Handle_WithEmailContainingUppercase_ShouldConvertToLowercase()
     {
         // Arrange
-        var instructorRequest = new InstructorRequestDTO
-        {
-            Name = "Dr. Smith",
-            Email = "DR.SMITH@EXAMPLE.COM"
-        };
+        var instructorRequest = GetValidInstructorRequest() with { Email = "DR.SMITH@EXAMPLE.COM" };
         var command = new CreateInstructorCommand(instructorRequest);
-        var cancellationToken = CancellationToken.None;
+        var cancellationToken = GetCancellationToken();
 
         // Act
         var result = await _handler.Handle(command, cancellationToken);
@@ -164,13 +138,9 @@ public class CreateInstructorCommandHandlerTests
     public async Task Handle_WithWhitespaceOnlyName_ShouldThrowArgumentException()
     {
         // Arrange
-        var instructorRequest = new InstructorRequestDTO
-        {
-            Name = "   ",
-            Email = "dr.smith@example.com"
-        };
+        var instructorRequest = GetValidInstructorRequest() with { Name = "   " };
         var command = new CreateInstructorCommand(instructorRequest);
-        var cancellationToken = CancellationToken.None;
+        var cancellationToken = GetCancellationToken();
 
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() => _handler.Handle(command, cancellationToken));
@@ -180,15 +150,20 @@ public class CreateInstructorCommandHandlerTests
     public async Task Handle_WithNullName_ShouldThrowArgumentException()
     {
         // Arrange
-        var instructorRequest = new InstructorRequestDTO
-        {
-            Name = null!,
-            Email = "dr.smith@example.com"
-        };
+        var instructorRequest = GetValidInstructorRequest() with { Name = null! };
         var command = new CreateInstructorCommand(instructorRequest);
-        var cancellationToken = CancellationToken.None;
+        var cancellationToken = GetCancellationToken();
 
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() => _handler.Handle(command, cancellationToken));
+    }
+
+    private static InstructorRequestDTO GetValidInstructorRequest()
+    {
+        return new InstructorRequestDTO
+        {
+            Name = "Dr. Smith",
+            Email = "dr.smith@example.com"
+        };
     }
 }

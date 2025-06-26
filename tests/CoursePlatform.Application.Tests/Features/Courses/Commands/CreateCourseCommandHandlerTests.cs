@@ -27,12 +27,7 @@ public class CreateCourseCommandHandlerTests
     public async Task Handle_WithValidCourse_ShouldCreateCourseSuccessfully()
     {
         // Arrange
-        var courseRequest = new CourseRequestDTO
-        {
-            Title = "Mathematics 101",
-            Description = "Introduction to Mathematics",
-            InstructorId = "instructor-123"
-        };
+        var courseRequest = GetValidCourseRequest();
         var command = new CreateCourseCommand(courseRequest);
         var cancellationToken = GetCancellationToken();
 
@@ -58,12 +53,7 @@ public class CreateCourseCommandHandlerTests
     public async Task Handle_WithValidCourse_ShouldCallAddAsyncOnRepository()
     {
         // Arrange
-        var courseRequest = new CourseRequestDTO
-        {
-            Title = "Mathematics 101",
-            Description = "Introduction to Mathematics",
-            InstructorId = "instructor-123"
-        };
+        var courseRequest = GetValidCourseRequest();
         var command = new CreateCourseCommand(courseRequest);
         var cancellationToken = GetCancellationToken();
 
@@ -72,9 +62,9 @@ public class CreateCourseCommandHandlerTests
 
         // Assert
         _courseRepositoryMock.Verify(
-            x => x.AddAsync(It.Is<Course>(c => 
-                c.Title == "Mathematics 101" && 
-                c.Description == "Introduction to Mathematics" && 
+            x => x.AddAsync(It.Is<Course>(c =>
+                c.Title == "Mathematics 101" &&
+                c.Description == "Introduction to Mathematics" &&
                 c.InstructorId == "instructor-123"), cancellationToken),
             Times.Once);
     }
@@ -83,12 +73,7 @@ public class CreateCourseCommandHandlerTests
     public async Task Handle_WithValidCourse_ShouldCallSaveChangesAsync()
     {
         // Arrange
-        var courseRequest = new CourseRequestDTO
-        {
-            Title = "Mathematics 101",
-            Description = "Introduction to Mathematics",
-            InstructorId = "instructor-123"
-        };
+        var courseRequest = GetValidCourseRequest();
         var command = new CreateCourseCommand(courseRequest);
         var cancellationToken = GetCancellationToken();
 
@@ -103,14 +88,9 @@ public class CreateCourseCommandHandlerTests
     public async Task Handle_WithEmptyTitle_ShouldThrowArgumentException()
     {
         // Arrange
-        var courseRequest = new CourseRequestDTO
-        {
-            Title = "",
-            Description = "Introduction to Mathematics",
-            InstructorId = "instructor-123"
-        };
+        var courseRequest = GetValidCourseRequest() with { Title = "" };
         var command = new CreateCourseCommand(courseRequest);
-        var cancellationToken = CancellationToken.None;
+        var cancellationToken = GetCancellationToken();
 
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() => _handler.Handle(command, cancellationToken));
@@ -120,14 +100,9 @@ public class CreateCourseCommandHandlerTests
     public async Task Handle_WithEmptyDescription_ShouldThrowArgumentException()
     {
         // Arrange
-        var courseRequest = new CourseRequestDTO
-        {
-            Title = "Mathematics 101",
-            Description = "",
-            InstructorId = "instructor-123"
-        };
+        var courseRequest = GetValidCourseRequest() with { Description = "" };
         var command = new CreateCourseCommand(courseRequest);
-        var cancellationToken = CancellationToken.None;
+        var cancellationToken = GetCancellationToken();
 
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() => _handler.Handle(command, cancellationToken));
@@ -137,14 +112,9 @@ public class CreateCourseCommandHandlerTests
     public async Task Handle_WithEmptyInstructorId_ShouldThrowArgumentException()
     {
         // Arrange
-        var courseRequest = new CourseRequestDTO
-        {
-            Title = "Mathematics 101",
-            Description = "Introduction to Mathematics",
-            InstructorId = ""
-        };
+        var courseRequest = GetValidCourseRequest() with { InstructorId = "" };
         var command = new CreateCourseCommand(courseRequest);
-        var cancellationToken = CancellationToken.None;
+        var cancellationToken = GetCancellationToken();
 
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() => _handler.Handle(command, cancellationToken));
@@ -154,14 +124,9 @@ public class CreateCourseCommandHandlerTests
     public async Task Handle_WithTitleContainingSpaces_ShouldTrimSpaces()
     {
         // Arrange
-        var courseRequest = new CourseRequestDTO
-        {
-            Title = "  Mathematics 101  ",
-            Description = "Introduction to Mathematics",
-            InstructorId = "instructor-123"
-        };
+        var courseRequest = GetValidCourseRequest() with { Title = "  Mathematics 101  " };
         var command = new CreateCourseCommand(courseRequest);
-        var cancellationToken = CancellationToken.None;
+        var cancellationToken = GetCancellationToken();
 
         // Act
         var result = await _handler.Handle(command, cancellationToken);
@@ -174,14 +139,9 @@ public class CreateCourseCommandHandlerTests
     public async Task Handle_WithDescriptionContainingSpaces_ShouldTrimSpaces()
     {
         // Arrange
-        var courseRequest = new CourseRequestDTO
-        {
-            Title = "Mathematics 101",
-            Description = "  Introduction to Mathematics  ",
-            InstructorId = "instructor-123"
-        };
+        var courseRequest = GetValidCourseRequest() with { Description = "  Introduction to Mathematics  " };
         var command = new CreateCourseCommand(courseRequest);
-        var cancellationToken = CancellationToken.None;
+        var cancellationToken = GetCancellationToken();
 
         // Act
         var result = await _handler.Handle(command, cancellationToken);
@@ -194,14 +154,9 @@ public class CreateCourseCommandHandlerTests
     public async Task Handle_WithWhitespaceOnlyTitle_ShouldThrowArgumentException()
     {
         // Arrange
-        var courseRequest = new CourseRequestDTO
-        {
-            Title = "   ",
-            Description = "Introduction to Mathematics",
-            InstructorId = "instructor-123"
-        };
+        var courseRequest = GetValidCourseRequest() with { Title = "   " };
         var command = new CreateCourseCommand(courseRequest);
-        var cancellationToken = CancellationToken.None;
+        var cancellationToken = GetCancellationToken();
 
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() => _handler.Handle(command, cancellationToken));
@@ -211,16 +166,21 @@ public class CreateCourseCommandHandlerTests
     public async Task Handle_WithNullTitle_ShouldThrowArgumentException()
     {
         // Arrange
-        var courseRequest = new CourseRequestDTO
-        {
-            Title = null!,
-            Description = "Introduction to Mathematics",
-            InstructorId = "instructor-123"
-        };
+        var courseRequest = GetValidCourseRequest() with { Title = null! };
         var command = new CreateCourseCommand(courseRequest);
-        var cancellationToken = CancellationToken.None;
+        var cancellationToken = GetCancellationToken();
 
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() => _handler.Handle(command, cancellationToken));
+    }
+    
+    private static CourseRequestDTO GetValidCourseRequest()
+    {
+        return new CourseRequestDTO
+        {
+            Title = "Mathematics 101",
+            Description = "Introduction to Mathematics",
+            InstructorId = "instructor-123"
+        };
     }
 }

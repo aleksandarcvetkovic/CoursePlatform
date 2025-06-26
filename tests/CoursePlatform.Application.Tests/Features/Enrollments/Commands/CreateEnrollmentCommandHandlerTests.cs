@@ -21,17 +21,24 @@ public class CreateEnrollmentCommandHandlerTests
         _handler = new CreateEnrollmentCommandHandler(_unitOfWorkMock.Object);
     }
 
-    [Fact]
-    public async Task Handle_WithValidEnrollment_ShouldCreateEnrollmentSuccessfully()
+    private static CancellationToken GetCancellationToken() => CancellationToken.None;
+
+    private static EnrollmentRequestDTO GetValidEnrollmentRequest()
     {
-        // Arrange
-        var enrollmentRequest = new EnrollmentRequestDTO
+        return new EnrollmentRequestDTO
         {
             StudentId = "student-123",
             CourseId = "course-456"
         };
+    }
+
+    [Fact]
+    public async Task Handle_WithValidEnrollment_ShouldCreateEnrollmentSuccessfully()
+    {
+        // Arrange
+        var enrollmentRequest = GetValidEnrollmentRequest();
         var command = new CreateEnrollmentCommand(enrollmentRequest);
-        var cancellationToken = CancellationToken.None;
+        var cancellationToken = GetCancellationToken();
 
         _enrollmentRepositoryMock
             .Setup(x => x.AddAsync(It.IsAny<Enrollment>(), cancellationToken))
@@ -56,13 +63,9 @@ public class CreateEnrollmentCommandHandlerTests
     public async Task Handle_WithValidEnrollment_ShouldCallAddAsyncOnRepository()
     {
         // Arrange
-        var enrollmentRequest = new EnrollmentRequestDTO
-        {
-            StudentId = "student-123",
-            CourseId = "course-456"
-        };
+        var enrollmentRequest = GetValidEnrollmentRequest();
         var command = new CreateEnrollmentCommand(enrollmentRequest);
-        var cancellationToken = CancellationToken.None;
+        var cancellationToken = GetCancellationToken();
 
         // Act
         await _handler.Handle(command, cancellationToken);
@@ -79,13 +82,9 @@ public class CreateEnrollmentCommandHandlerTests
     public async Task Handle_WithValidEnrollment_ShouldCallSaveChangesAsync()
     {
         // Arrange
-        var enrollmentRequest = new EnrollmentRequestDTO
-        {
-            StudentId = "student-123",
-            CourseId = "course-456"
-        };
+        var enrollmentRequest = GetValidEnrollmentRequest();
         var command = new CreateEnrollmentCommand(enrollmentRequest);
-        var cancellationToken = CancellationToken.None;
+        var cancellationToken = GetCancellationToken();
 
         // Act
         await _handler.Handle(command, cancellationToken);
@@ -98,13 +97,9 @@ public class CreateEnrollmentCommandHandlerTests
     public async Task Handle_WithValidEnrollment_ShouldSetEnrolledOnToCurrentTime()
     {
         // Arrange
-        var enrollmentRequest = new EnrollmentRequestDTO
-        {
-            StudentId = "student-123",
-            CourseId = "course-456"
-        };
+        var enrollmentRequest = GetValidEnrollmentRequest();
         var command = new CreateEnrollmentCommand(enrollmentRequest);
-        var cancellationToken = CancellationToken.None;
+        var cancellationToken = GetCancellationToken();
         var timeBeforeCall = DateTime.UtcNow;
 
         // Act
@@ -120,13 +115,9 @@ public class CreateEnrollmentCommandHandlerTests
     public async Task Handle_WithNewEnrollment_ShouldHaveNullGrade()
     {
         // Arrange
-        var enrollmentRequest = new EnrollmentRequestDTO
-        {
-            StudentId = "student-123",
-            CourseId = "course-456"
-        };
+        var enrollmentRequest = GetValidEnrollmentRequest();
         var command = new CreateEnrollmentCommand(enrollmentRequest);
-        var cancellationToken = CancellationToken.None;
+        var cancellationToken = GetCancellationToken();
 
         // Act
         var result = await _handler.Handle(command, cancellationToken);
@@ -139,13 +130,13 @@ public class CreateEnrollmentCommandHandlerTests
     public async Task Handle_WithValidIds_ShouldPreserveStudentAndCourseIds()
     {
         // Arrange
-        var enrollmentRequest = new EnrollmentRequestDTO
-        {
-            StudentId = "student-999",
-            CourseId = "course-888"
+        var enrollmentRequest = GetValidEnrollmentRequest() with 
+        { 
+            StudentId = "student-999", 
+            CourseId = "course-888" 
         };
         var command = new CreateEnrollmentCommand(enrollmentRequest);
-        var cancellationToken = CancellationToken.None;
+        var cancellationToken = GetCancellationToken();
 
         // Act
         var result = await _handler.Handle(command, cancellationToken);
@@ -159,19 +150,19 @@ public class CreateEnrollmentCommandHandlerTests
     public async Task Handle_WithDifferentStudentsAndCourses_ShouldCreateSeparateEnrollments()
     {
         // Arrange
-        var enrollmentRequest1 = new EnrollmentRequestDTO
-        {
-            StudentId = "student-1",
-            CourseId = "course-1"
+        var enrollmentRequest1 = GetValidEnrollmentRequest() with 
+        { 
+            StudentId = "student-1", 
+            CourseId = "course-1" 
         };
-        var enrollmentRequest2 = new EnrollmentRequestDTO
-        {
-            StudentId = "student-2",
-            CourseId = "course-2"
+        var enrollmentRequest2 = GetValidEnrollmentRequest() with 
+        { 
+            StudentId = "student-2", 
+            CourseId = "course-2" 
         };
         var command1 = new CreateEnrollmentCommand(enrollmentRequest1);
         var command2 = new CreateEnrollmentCommand(enrollmentRequest2);
-        var cancellationToken = CancellationToken.None;
+        var cancellationToken = GetCancellationToken();
 
         // Act
         var result1 = await _handler.Handle(command1, cancellationToken);

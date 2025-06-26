@@ -1,13 +1,13 @@
 namespace CoursePlatform.Application.DTOs;
 
-public class CourseRequestDTO
+public record CourseRequestDTO
 {
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string InstructorId { get; set; } = string.Empty;
 }
 
-public class CourseResponseDTO
+public record CourseResponseDTO
 {
     public string Id { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
@@ -15,7 +15,7 @@ public class CourseResponseDTO
     public string InstructorId { get; set; } = string.Empty;
 }
 
-public class CourseWithInstructorDTO
+public record CourseWithInstructorDTO
 {
     public string Id { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;

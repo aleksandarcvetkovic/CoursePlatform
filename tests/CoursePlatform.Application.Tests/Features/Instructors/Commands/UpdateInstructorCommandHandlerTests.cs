@@ -23,6 +23,17 @@ public class UpdateInstructorCommandHandlerTests
         _handler = new UpdateInstructorCommandHandler(_unitOfWorkMock.Object);
     }
 
+    private static CancellationToken GetCancellationToken() => CancellationToken.None;
+
+    private static InstructorRequestDTO GetValidInstructorRequest()
+    {
+        return new InstructorRequestDTO
+        {
+            Name = "Dr. John Smith",
+            Email = "john.smith@example.com"
+        };
+    }
+
     [Fact]
     public async Task Handle_WithValidInstructor_ShouldReturnNotNull()
     {

@@ -1,12 +1,12 @@
 namespace CoursePlatform.Application.DTOs;
 
-public class EnrollmentRequestDTO
+public record EnrollmentRequestDTO
 {
     public string CourseId { get; set; } = string.Empty;
     public string StudentId { get; set; } = string.Empty;
 }
 
-public class EnrollmentResponseDTO
+public record EnrollmentResponseDTO
 {
     public string Id { get; set; } = string.Empty;
     public string CourseId { get; set; } = string.Empty;
@@ -15,12 +15,12 @@ public class EnrollmentResponseDTO
     public double? Grade { get; set; }
 }
 
-public class EnrollmentGradeRequestDTO
+public record EnrollmentGradeRequestDTO
 {
     public double Grade { get; set; }
 }
 
-public class EnrollmentWithStudentCourseDTO
+public record EnrollmentWithStudentCourseDTO
 {
     public string Id { get; set; } = string.Empty;
     public string StudentId { get; set; } = string.Empty;

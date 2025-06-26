@@ -24,6 +24,16 @@ public class UpdateCourseCommandHandlerTests
 
     private static CancellationToken GetCancellationToken() => CancellationToken.None;
 
+    private static CourseRequestDTO GetValidCourseRequest()
+    {
+        return new CourseRequestDTO
+        {
+            Title = "New Title",
+            Description = "New Description",
+            InstructorId = "instructor-2"
+        };
+    }
+
     [Fact]
     public async Task Handle_WithValidCourseAndExistingId_ShouldUpdateCourseSuccessfully()
     {
@@ -32,12 +42,7 @@ public class UpdateCourseCommandHandlerTests
         var existingCourse = Course.Create("Old Title", "Old Description", "instructor-1");
         existingCourse.Id = courseId;
 
-        var courseRequest = new CourseRequestDTO
-        {
-            Title = "New Title",
-            Description = "New Description",
-            InstructorId = "instructor-2"
-        };
+        var courseRequest = GetValidCourseRequest();
         var command = new UpdateCourseCommand(courseId, courseRequest);
         var cancellationToken = GetCancellationToken();
 

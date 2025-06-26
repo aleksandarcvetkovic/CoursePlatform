@@ -23,15 +23,20 @@ public class CreateStudentCommandHandlerTests
 
     private static CancellationToken GetCancellationToken() => CancellationToken.None;
 
-    [Fact]
-    public async Task Handle_WithValidStudent_ShouldCreateStudentSuccessfully()
+    private static StudentRequestDTO GetValidStudentRequest()
     {
-        // Arrange
-        var studentRequest = new StudentRequestDTO
+        return new StudentRequestDTO
         {
             Name = "John Doe",
             Email = "john.doe@example.com"
         };
+    }
+
+    [Fact]
+    public async Task Handle_WithValidStudent_ShouldCreateStudentSuccessfully()
+    {
+        // Arrange
+        var studentRequest = GetValidStudentRequest();
         var command = new CreateStudentCommand(studentRequest);
         var cancellationToken = GetCancellationToken();
 
@@ -56,11 +61,7 @@ public class CreateStudentCommandHandlerTests
     public async Task Handle_WithValidStudent_ShouldCallAddAsyncOnRepository()
     {
         // Arrange
-        var studentRequest = new StudentRequestDTO
-        {
-            Name = "John Doe",
-            Email = "john.doe@example.com"
-        };
+        var studentRequest = GetValidStudentRequest();
         var command = new CreateStudentCommand(studentRequest);
         var cancellationToken = GetCancellationToken();
 
@@ -77,11 +78,7 @@ public class CreateStudentCommandHandlerTests
     public async Task Handle_WithValidStudent_ShouldCallSaveChangesAsync()
     {
         // Arrange
-        var studentRequest = new StudentRequestDTO
-        {
-            Name = "John Doe",
-            Email = "john.doe@example.com"
-        };
+        var studentRequest = GetValidStudentRequest();
         var command = new CreateStudentCommand(studentRequest);
         var cancellationToken = GetCancellationToken();
 
