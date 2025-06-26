@@ -1,0 +1,12 @@
+{
+  "testTimeout": 300000,
+  "methodDisplay": "method",
+  "longRunningTestSeconds": 5,
+  "parallelizeTestCollections": true,
+  "maxParallelThreads": 4,
+  "preEnumerateTheories": false,
+  "shadowCopy": false,
+  "stopOnFail": false,
+  "diagnosticMessages": true,
+  "internalDiagnosticMessages": false
+}

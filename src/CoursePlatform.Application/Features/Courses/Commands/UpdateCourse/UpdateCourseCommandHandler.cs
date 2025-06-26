@@ -12,9 +12,11 @@ public class UpdateCourseCommandHandler : IRequestHandler<UpdateCourseCommand, C
     public UpdateCourseCommandHandler(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
-    }    public async Task<CourseResponseDTO> Handle(UpdateCourseCommand request, CancellationToken cancellationToken)
+    }
+    public async Task<CourseResponseDTO> Handle(UpdateCourseCommand request, CancellationToken cancellationToken)
     {
-        var course = await _unitOfWork.Courses.GetByIdAsync(request.Id, cancellationToken);        if (course == null)
+        var course = await _unitOfWork.Courses.GetByIdAsync(request.Id, cancellationToken);
+        if (course == null)
             throw new NotFoundException($"Course with ID '{request.Id}' was not found.");
 
         course.Update(request.Course.Title, request.Course.Description, request.Course.InstructorId);
