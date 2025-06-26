@@ -11,12 +11,23 @@ internal record ValidationApiResponse
     public bool IsValid { get; init; }
     
     /// <summary>
-    /// Error message from the external service if validation failed
+    /// List of field-specific validation errors from the external service
     /// </summary>
-    public string? ErrorMessage { get; init; }
+    public List<ValidationApiError> Errors { get; init; } = new();
+}
+
+/// <summary>
+/// Represents a validation error from the external API
+/// </summary>
+internal record ValidationApiError
+{
+    /// <summary>
+    /// The field name that has the validation error
+    /// </summary>
+    public string Field { get; init; } = string.Empty;
     
     /// <summary>
-    /// List of specific validation errors from the external service
+    /// The validation error message
     /// </summary>
-    public List<string> ValidationErrors { get; init; } = new();
+    public string Message { get; init; } = string.Empty;
 }

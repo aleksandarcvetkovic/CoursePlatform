@@ -1,3 +1,4 @@
+using CoursePlatform.Application.Common.Exceptions;
 using CoursePlatform.Application.Common.Mappings;
 using CoursePlatform.Application.DTOs;
 using CoursePlatform.Application.Services;
@@ -26,13 +27,7 @@ public class CreateStudentCommandHandler : IRequestHandler<CreateStudentCommand,
         
         if (!validationResult.IsValid)
         {
-            var failures = validationResult.ValidationErrors
-                .Select(error => new FluentValidation.Results.ValidationFailure("Student", error))
-                .ToList();
-
-                Console.WriteLine($"Service said: validation failed for student {request.Student.Email}: {string.Join(", ", validationResult.ValidationErrors)}");
-            
-            throw new ValidationException(failures);
+            throw new BadRequestException(validationResult.Errors.ToString());
         }
 
         var student = Student.Create(request.Student.Name, request.Student.Email);

@@ -11,14 +11,9 @@ public record StudentValidationResult
     public bool IsValid { get; init; }
     
     /// <summary>
-    /// General error message if validation failed
+    /// List of field-specific validation errors
     /// </summary>
-    public string? ErrorMessage { get; init; }
-    
-    /// <summary>
-    /// List of specific validation errors
-    /// </summary>
-    public List<string> ValidationErrors { get; init; } = new();
+    public List<ValidationError> Errors { get; init; } = new();
     
     /// <summary>
     /// Creates a successful validation result
@@ -27,16 +22,43 @@ public record StudentValidationResult
     public static StudentValidationResult Success() => new() { IsValid = true };
     
     /// <summary>
-    /// Creates a failed validation result with error details
+    /// Creates a failed validation result with field-specific errors
     /// </summary>
-    /// <param name="errorMessage">The main error message</param>
-    /// <param name="validationErrors">Optional list of specific validation errors</param>
+    /// <param name="errors">List of validation errors</param>
     /// <returns>A validation result indicating failure</returns>
-    public static StudentValidationResult Failure(string errorMessage, List<string>? validationErrors = null) => 
+    public static StudentValidationResult Failure(params ValidationError[] errors) => 
         new() 
         { 
             IsValid = false, 
-            ErrorMessage = errorMessage,
-            ValidationErrors = validationErrors ?? new List<string>()
+            Errors = errors.ToList()
         };
+    
+    /// <summary>
+    /// Creates a failed validation result with a single field error
+    /// </summary>
+    /// <param name="field">The field name</param>
+    /// <param name="message">The error message</param>
+    /// <returns>A validation result indicating failure</returns>
+    public static StudentValidationResult Failure(string field, string message) => 
+        new() 
+        { 
+            IsValid = false, 
+            Errors = new List<ValidationError> { new() { Field = field, Message = message } }
+        };
+}
+
+/// <summary>
+/// Represents a specific validation error for a field
+/// </summary>
+public record ValidationError
+{
+    /// <summary>
+    /// The field name that has the validation error
+    /// </summary>
+    public string Field { get; init; } = string.Empty;
+    
+    /// <summary>
+    /// The validation error message
+    /// </summary>
+    public string Message { get; init; } = string.Empty;
 }
