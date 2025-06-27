@@ -1,4 +1,5 @@
 using CoursePlatform.Application;
+using CoursePlatform.Application.Services;
 using CoursePlatform.Infrastructure;
 using CoursePlatform.Api.Presentation.Endpoints;
 using CoursePlatform.Api.Common.Middleware;
@@ -12,8 +13,9 @@ builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
 // Add layers
-builder.Services.AddApplication();
+builder.Services.AddApplication(builder.Configuration);
 builder.Services.AddInfrastructureExtension(builder.Configuration);
 
 var app = builder.Build();
