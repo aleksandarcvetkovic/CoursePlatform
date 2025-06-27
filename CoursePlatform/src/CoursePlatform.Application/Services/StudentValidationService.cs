@@ -1,3 +1,4 @@
+using CoursePlatform.Application.Common.Options;
 using CoursePlatform.Application.DTOs;
 using CoursePlatform.Application.Services.Internal;
 using Microsoft.Extensions.Logging;
@@ -39,9 +40,8 @@ public class StudentValidationService : IStudentValidationService
 
             if (!response.IsSuccessStatusCode)
             {
-                var errorMessage = $"Validation service returned {response.StatusCode}";
                 _logger.LogError("Validation failed with status: {StatusCode}", response.StatusCode);
-                return StudentValidationResult.Failure("ValidationService", errorMessage);
+                return StudentValidationResult.Failure($"HTTP {response.StatusCode}: {response.ReasonPhrase}");
             }
 
             var result = await response.Content.ReadFromJsonAsync<ValidationApiResponse>(cancellationToken);
@@ -50,7 +50,7 @@ public class StudentValidationService : IStudentValidationService
             {
                 const string errorMessage = "Received null response from validation service";
                 _logger.LogWarning(errorMessage);
-                return StudentValidationResult.Failure("ValidationService", errorMessage);
+                return StudentValidationResult.Failure(errorMessage);
             }
 
             _logger.LogInformation("Validation completed for {Email}: {IsValid}", student.Email, result.IsValid);
@@ -61,21 +61,15 @@ public class StudentValidationService : IStudentValidationService
             }
             else
             {
-                // Convert API errors to ValidationError objects
-                var validationErrors = result.Errors.Select(e => new ValidationError 
-                { 
-                    Field = e.Field, 
-                    Message = e.Message 
-                }).ToArray();
-                
-                return StudentValidationResult.Failure(validationErrors);
+                var errorMessage = result.Message ?? "Student validation failed";
+                return StudentValidationResult.Failure(errorMessage);
             }
         }
         catch (Exception ex)
         {
             var errorMessage = $"Error validating student {student.Email}: {ex.Message}";
             _logger.LogError(ex, "Error validating student {Email}", student.Email);
-            return StudentValidationResult.Failure("ValidationService", errorMessage);
+            return StudentValidationResult.Failure(errorMessage);
         }
     }
 }

@@ -27,7 +27,8 @@ public class CreateStudentCommandHandler : IRequestHandler<CreateStudentCommand,
         
         if (!validationResult.IsValid)
         {
-            throw new BadRequestException(validationResult.Errors.ToString());
+            Console.WriteLine($"Validation failed: {validationResult.ErrorMessage}");
+            throw new BadRequestException(validationResult.ErrorMessage);
         }
 
         var student = Student.Create(request.Student.Name, request.Student.Email);

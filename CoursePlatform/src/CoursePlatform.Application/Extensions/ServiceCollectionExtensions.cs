@@ -1,3 +1,4 @@
+using CoursePlatform.Application.Common.Options;
 using CoursePlatform.Application.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,10 +15,9 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services, 
         IConfiguration configuration)
     {
-        // Configure options with validation
+        
         services.Configure<StudentValidationOptions>(configuration.GetSection(StudentValidationOptions.SectionName));
 
-        // Configure HTTP client with typed client pattern and best practices
         services.AddHttpClient<IStudentValidationService, StudentValidationService>((serviceProvider, client) =>
         {
             var options = serviceProvider.GetRequiredService<IOptions<StudentValidationOptions>>().Value;
@@ -34,18 +34,6 @@ public static class ServiceCollectionExtensions
             // Standard headers
             client.DefaultRequestHeaders.Add("Accept", "application/json");
             client.DefaultRequestHeaders.Add("User-Agent", "CoursePlatform/1.0");
-        })
-        .ConfigurePrimaryHttpMessageHandler(() =>
-        {
-            return new HttpClientHandler()
-            {
-                // Enable compression
-                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
-                // Connection management
-                MaxConnectionsPerServer = 10,
-                // Security
-                CheckCertificateRevocationList = true
-            };
         })
         .SetHandlerLifetime(TimeSpan.FromMinutes(5)); // Proper handler lifecycle
 
